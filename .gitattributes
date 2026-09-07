@@ -1,0 +1,13 @@
+# Keep Windows line-ending translation away from the media. Git detects most
+# binaries itself, but a mangled mp4 is invisible until the film refuses to
+# decode in the browser.
+*.mp4   binary
+*.jpg   binary
+*.png   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
+*.svg   text eol=lf
+*.html  text eol=lf
+*.js    text eol=lf
+*.css   text eol=lf
