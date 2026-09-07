@@ -454,13 +454,26 @@ p{margin:0}
    to say `img` only, which is exactly how that happened. */
 .split img,.split video{width:100%;height:clamp(340px,66vh,660px);
   object-fit:cover;display:block}
-/* The media bleeds to the viewport edge. 50% is half the 1180 container,
-   50vw is half the screen — the difference is precisely the gap to the edge,
-   so this works at any width without magic numbers. */
+/* The media bleeds to the viewport edge.
+   The old rule was margin-right: calc(50% - 50vw), on the belief that 50% was
+   half the 1180 container. It is not: a margin percentage on a grid item
+   resolves against its GRID AREA, which is the column, not the container. So
+   the figure ran past the viewport edge by 246-323px at every desktop width.
+   object-fit centres the frame in that oversized box and the viewport then
+   clips a different ~320px off each side depending on reading direction, so
+   English kept the pallets and Arabic kept the empty floor -- the same clip at
+   the same scale, framed differently per language. That is what read as the
+   Arabic video being "enlarged".
+   --gutter is the real distance from the container edge to the viewport edge:
+   the section's own padding, or half the leftover once the container caps at
+   1180, whichever is larger. Logical properties, so RTL mirrors by itself. */
 @media(min-width:900px){
   .split{align-items:start}
-  .split > figure{margin-right:calc(50% - 50vw)}
-  .split > figure figcaption{padding-right:calc(50vw - 50%)}
+  .split > figure{
+    --gutter:max(clamp(22px,6vw,90px), calc((100vw - 1180px) / 2));
+    margin-inline-end:calc(-1 * var(--gutter))}
+  .split > figure figcaption{
+    padding-inline-end:max(clamp(22px,6vw,90px), calc((100vw - 1180px) / 2))}
 }
 /* On a phone a 16:9 film forced into a 66vh box shows ~39% of its width.
    Let the media keep its own shape instead of being cropped to fit. */
@@ -1186,10 +1199,6 @@ html[dir="rtl"] .sec.light .kicker[data-n]::before{border-left-color:rgba(var(--
 html[dir="rtl"] .sec::before{left:auto;right:clamp(22px,6vw,90px)}
 html[dir="rtl"] .routes-list li{padding:10px 0 0 10px}
 html[dir="rtl"] .chain .ch-t{text-align:right}
-@media(min-width:900px){
-  html[dir="rtl"] .split > figure{margin-right:0;margin-left:calc(50% - 50vw)}
-  html[dir="rtl"] .split > figure figcaption{padding-right:0;padding-left:calc(50vw - 50%)}
-}
 /* Latin digits stay LTR: the phone number must dial and the CR must check */
 html[dir="rtl"] .fig .k,html[dir="rtl"] .th-v,html[dir="rtl"] .span-v,
 html[dir="rtl"] .ch-t,html[dir="rtl"] .plot-co,html[dir="rtl"] .cbox a,
