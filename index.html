@@ -1586,7 +1586,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="hud" id="dHud" aria-hidden="true">
       <div class="hud-tl">
         <span class="hud-lbl">Convergence</span>
-        <span class="hud-val" id="hudCoord">23.6&deg;N 57.9&deg;E</span>
+        <span class="hud-val" id="hudCoord">23.66&deg;N 57.94&deg;E</span>
       </div>
       <div class="hud-tr">
         <span class="season" id="season" aria-live="polite">
@@ -2647,6 +2647,9 @@ function beatWindow(i){
    actually moving. The .scrollcue lookup used to be a querySelector per frame;
    it is now resolved once. */
 const cue = document.querySelector(".scrollcue");
+/* Khazaen, Barka -- the unit inside Silal. Written once here and stated
+   again in the beat copy; the two must not be able to disagree. */
+const MARKET = "23.66°N 57.94°E";
 const prev = { hud: -1, coord: "", cue: -1, beat: [] };
 vig.style.opacity = 1;
 
@@ -2655,15 +2658,16 @@ function frame(p){
   const hudOn = +(1 - range(p, ARC_END * 0.75, ARC_END)).toFixed(3);
   if (hudOn !== prev.hud) { hud.style.opacity = hudOn; prev.hud = hudOn; }
 
-  const active = Math.min(ALL.length - 1,
-                          Math.floor(range(p, 0, ARC_END * 0.80) / 0.104));
-
-  const n = ALL[clamp(active, 0, ALL.length - 1)];
-  if (n) {
-    const txt = Math.abs(n.lat).toFixed(1)+"°"+(n.lat>=0?"N":"S")+" "+
-                Math.abs(n.lon).toFixed(1)+"°"+(n.lon>=0?"E":"W");
-    if (txt !== prev.coord) { coord.textContent = txt; prev.coord = txt; }
-  }
+  /* This readout is labelled "Convergence" -- the one place everything the
+     company handles arrives at. It used to cycle through the ORIGINS as each
+     route arc was drawn, which made sense while the arcs existed. The arcs were
+     removed, and the cycling was left behind: the label now said Convergence
+     while showing 25.0N 55.1E (Jebel Ali, UAE) a moment into the scroll, then
+     rested on 24.5N 56.6E -- Sohar Port -- for the remaining 95% of the film,
+     over footage of the market at Barka. The client spotted it.
+     There is exactly one convergence point and it does not move: their own
+     unit at Silal, the same figure the beat copy underneath already states. */
+  if (prev.coord !== MARKET) { coord.textContent = MARKET; prev.coord = MARKET; }
 
   beats.forEach((el,i) => {
     const [a,b] = beatWindow(i);
