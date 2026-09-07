@@ -1,0 +1,5 @@
+# PREVIEW BUILD - not the production site.
+# Delete this file and restore the launch robots.txt when the real
+# domain goes live, or the real site will inherit this and stay unindexed.
+User-agent: *
+Disallow: /
