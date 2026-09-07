@@ -64,7 +64,7 @@
     "postOfficeBoxNumber": "375",
     "addressCountry": "OM"
   },
-  "geo": { "@type": "GeoCoordinates", "latitude": 23.66, "longitude": 57.94 },
+  "geo": { "@type": "GeoCoordinates", "latitude": 23.5787, "longitude": 57.8014 },
   "areaServed": { "@type": "Country", "name": "Oman" },
   "knowsLanguage": ["en", "ar"]
 }
@@ -1495,6 +1495,21 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 @media (max-width:360px){
   .langtabs button{min-width:38px;padding-inline:7px}
 }
+
+/* ---------- content-visibility: measured, and rejected ----------
+   Tried content-visibility:auto with contain-intrinsic-size on the six
+   non-pinned sections. It did what it promises -- paint fell from 403ms to
+   333ms across a scroll -- but the frame timing got WORSE, p90 17ms to 33ms
+   and p99 67ms to 117ms, repeatably over two runs.
+
+   The reason is that this page is a linear story: the reader passes through
+   every section, so nothing is ever "saved". All the property does here is
+   move steady paint into a burst of style and layout at the moment each
+   section arrives, which is precisely when there is no headroom for it.
+   Left out on purpose. It is the right tool for a long page most of which is
+   never reached, and the wrong one for this. */
+/* a video is its own painting surface; keep its repaints out of the page's */
+.chain figure, .dip figure, .split > figure{contain:paint}
 </style>
 <link rel="alternate" hreflang="en" href="./index.html">
 <link rel="alternate" hreflang="ar" href="./ar/index.html">
@@ -1586,7 +1601,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="hud" id="dHud" aria-hidden="true">
       <div class="hud-tl">
         <span class="hud-lbl">Convergence</span>
-        <span class="hud-val" id="hudCoord">23.66&deg;N 57.94&deg;E</span>
+        <span class="hud-val" id="hudCoord">23.58&deg;N 57.80&deg;E</span>
       </div>
       <div class="hud-tr">
         <span class="season" id="season" aria-live="polite">
@@ -1610,11 +1625,11 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <p>From a Batinah farm 143 km away to Buenos Aires 13,733 away. All of it lands at one market, outside the Strait of Hormuz.</p>
       </article>
       <article class="d-beat" data-b="1">
-        <div class="t">23.66°N 57.94°E</div>
+        <div class="t">23.58°N 57.80°E</div>
         <h2>Everything lands<br>in one place.</h2>
       </article>
       <article class="d-beat" data-b="2">
-        <div class="t">23.66°N 57.94°E · Khazaen, Barka</div>
+        <div class="t">23.58°N 57.80°E · Khazaen, Barka</div>
         <h2>We don't buy at<br>the market.<br>We work inside it.</h2>
         <p>Our unit sits within Silal, Oman's central fruit and vegetable market. First pick at four in the morning, and no middle step between the trading floor and our cold room.</p>
       </article>
@@ -1997,11 +2012,11 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <!-- Deliberately empty. The client asked to see what is still outstanding,
          so the gaps are drawn rather than hidden. Delete .pending before launch. -->
     <a class="findus rv" target="_blank" rel="noopener"
-       href="https://www.openstreetmap.org/?mlat=23.66&amp;mlon=57.94#map=13/23.66/57.94"
+       href="https://www.openstreetmap.org/?mlat=23.5787&amp;mlon=57.8014#map=14/23.5787/57.8014"
        aria-label="Open the Khazaen, Barka location in a map">
       <span class="fu-k">Directions</span>
       <span class="fu-n">Unit CSE&nbsp;30, Silal Central Market</span>
-      <span class="fu-c">23.66&deg;N 57.94&deg;E &middot; Barka, Al Batinah South</span>
+      <span class="fu-c">23.58&deg;N 57.80&deg;E &middot; Barka, Al Batinah South</span>
       <span class="fu-go">Open in maps &rarr;</span>
     </a>
 
@@ -2649,7 +2664,11 @@ function beatWindow(i){
 const cue = document.querySelector(".scrollcue");
 /* Khazaen, Barka -- the unit inside Silal. Written once here and stated
    again in the beat copy; the two must not be able to disagree. */
-const MARKET = "23.66°N 57.94°E";
+/* Taken from the company's own Google Business listing, GOLDEN RAIN EST,
+   at 23.578728 N 57.801445 E. The page had been quoting 23.66 / 57.94,
+   which is 16.8 km away -- in the HUD, in two beat headings, in the map
+   link and in the structured data search engines read. */
+const MARKET = "23.58°N 57.80°E";
 const prev = { hud: -1, coord: "", cue: -1, beat: [] };
 vig.style.opacity = 1;
 
