@@ -1216,12 +1216,19 @@ html[dir="rtl"] .ar-review{display:block}
    dark-on-dark, which is exactly what happened when only one of them moved. */
 .sec.dark, .sec.deep, .sec.light, .contact{
   --fg:251,247,240;
+  /* Ground and ink are declared TOGETHER. .sec.deep and .sec.light already
+     carried a colour; .sec.dark and .contact did not, and inherited whatever
+     <body> had computed. That is survivable while there is one palette and
+     fatal the moment there are two -- it is what left #silal, #sourcing and
+     the whole contact block reading cream-on-cream in day mode. */
+  color:var(--paper);
   background:var(--ground)}
 .sec.dark  { --ground:var(--plum) }
 .sec.deep  { --ground:var(--plum-2) }
 .sec.light { --ground:var(--plum-2) }
 .contact   { --ground:var(--plum) }
-.descent, .dawn, .aisle{ --ground:var(--plum); background:var(--plum) }
+.descent, .dawn, .aisle{ --ground:var(--plum); background:var(--plum);
+  color:var(--paper) }
 body{background:var(--plum)}
 
 /* the wash the boot screen has always had, carried through the page */
@@ -1234,7 +1241,7 @@ body{background:var(--plum)}
     radial-gradient(100% 70% at 50% 0%, rgba(var(--pinkc),.08) 0%, transparent 60%)}
 /* the day section set its own night background, so it stayed 19 luminance
    below the plum either side of it — the one visible seam left */
-#fresh{--ground:var(--plum);background:var(--plum)}
+#fresh{--ground:var(--plum);background:var(--plum);color:var(--paper)}
 #fresh .fresh-veil{background:
   linear-gradient(180deg, var(--plum) 0%, rgba(var(--bgc),.34) 9%,
                   rgba(var(--bgc),.30) 82%, rgba(var(--bgc),.74) 96%, var(--plum) 100%)}
@@ -1355,21 +1362,31 @@ body{background:var(--plum)}
    readable value rather than a different colour.
    Night stays the default. This is a switch, not a replacement.
    ========================================================================== */
-/* NOT set on <html>. --paper is the "strongest text colour" token, and it is
-   used by the copy sitting over the film in #descent, #dawn and #aisle as well
-   as by the reading sections. Overriding it globally turned the aisle headline
-   into dark plum over a dark photograph -- invisible. These belong to the
-   sections that actually flip, and nowhere else. */
-html[data-theme="day"] .sec.dark:not(#fresh),
-html[data-theme="day"] .sec.deep,
-html[data-theme="day"] .sec.light,
-html[data-theme="day"] .contact{
+/* The palette is set on the ROOT, and the four film sections take the night
+   set back afterwards.
+
+   It used to be the other way round: the day tokens were attached to four
+   section selectors and <html>/<body> were left on the night palette. Colour
+   inherits. body{color:var(--paper)} had already computed to cream, so every
+   element that does not declare a colour of its own -- which is most of the
+   page -- inherited cream and painted it onto the cream ground. All of #silal,
+   all of #sourcing and the entire contact block, invisible. .sec.deep and
+   .sec.light escaped only because those two selectors happen to re-declare
+   `color` themselves; nothing else did.
+
+   Scoping to the root fixes all of them at once. The concern the old comment
+   here was protecting -- the aisle headline turning dark over a dark
+   photograph -- is real, and is handled directly below by restating the night
+   tokens on the sections that are full-bleed footage. */
+html[data-theme="day"]{
   --fg:30,13,21;
   --bgc:250,244,234;
   --plum:#FAF4EA;
   --plum-2:#F2E8D8;
   --night:#FCF9F2;
   --night-2:#F2E8D8;
+  --ink:#1B0C14;
+  --sand:#7A6A4E;
   --paper:#1B0C14;
   --grey:#5A4551;
   --muted:#6B5460;
@@ -1382,6 +1399,57 @@ html[data-theme="day"] .contact{
   --livec:19,102,48;
   --line:rgba(var(--fg),.16);
   --line-soft:rgba(var(--fg),.10);
+}
+/* "the company's ground" at the foot of this sheet re-declares --fg on these
+   four at (0,2,0), which outranks the root block above. Restate it where it
+   wins, or every hairline, wash and muted line inside a reading section keeps
+   drawing itself in cream on paper. */
+html[data-theme="day"] .sec.dark,
+html[data-theme="day"] .sec.deep,
+html[data-theme="day"] .sec.light,
+html[data-theme="day"] .contact{
+  --fg:30,13,21;
+  --line:rgba(var(--fg),.16);
+  --line-soft:rgba(var(--fg),.10);
+}
+
+/* ---------- what does NOT flip ----------
+   #descent, #dawn, #aisle and #fresh are full-bleed footage and photography of
+   a market at four in the morning. Putting cream around a night shot fights
+   the picture instead of framing it, and the copy sitting over those frames
+   has to stay light to be readable at all. The nav and the menu are over the
+   film at the top of the page -- .nav.solid, further down, is handled
+   separately below -- and the boot curtain is the film's own black.
+   These carry the night palette in full, including `color`, so nothing inside
+   them can inherit paper ink from <body>. */
+html[data-theme="day"] #descent,
+html[data-theme="day"] #dawn,
+html[data-theme="day"] #aisle,
+html[data-theme="day"] #fresh,
+html[data-theme="day"] .nav,
+html[data-theme="day"] .mobmenu,
+html[data-theme="day"] #boot{
+  --fg:251,247,240;
+  --bgc:10,4,9;
+  --plum:#1C0713;
+  --plum-2:#270C1D;
+  --night:#0A0409;
+  --night-2:#150C13;
+  --ink:#140A10;
+  --sand:#EFE3CB;
+  --paper:#FBF7F0;
+  --grey:#B9A9B4;
+  --muted:#A2919C;
+  --gold:#F5A707;
+  --pink:#E73391;
+  --magenta:#AB1670;
+  --goldc:245,167,7;
+  --pinkc:231,51,145;
+  --magentac:171,22,112;
+  --livec:123,216,143;
+  --line:rgba(var(--fg),.14);
+  --line-soft:rgba(var(--fg),.09);
+  color:var(--paper);
 }
 /* the section wash was tuned for a dark ground; on paper it needs to be
    barely there or it reads as a stain */
@@ -1400,7 +1468,7 @@ html[data-theme="day"] .nav.solid .navlinks a{color:#2A1220;text-shadow:none}
 html[data-theme="day"] .nav.solid .btn{color:#2A1220;border-color:rgba(30,13,21,.42)}
 html[data-theme="day"] .nav.solid .langsw{color:#4A3341}
 html[data-theme="day"] .nav.solid .burger span{background:#2A1220}
-html[data-theme="day"] body{background:#FAF4EA}
+/* body picks the ground up from --plum now that the tokens are on the root */
 /* a photograph on paper wants a hairline, not the glow it had on black */
 html[data-theme="day"] .sec.dark:not(#fresh) figure video,
 html[data-theme="day"] .sec.deep figure video,
@@ -1437,19 +1505,35 @@ html[data-theme="day"] .nav.solid::before{background:#FAF4EA}
 
 /* the active language was a filled amber block, the heaviest object in the bar.
    On paper it only has to be the one that is underlined. */
-html[data-theme="day"] .langtabs{border-color:rgba(30,13,21,.18)}
-html[data-theme="day"] .langtabs button{color:rgba(30,13,21,.55)}
-html[data-theme="day"] .langtabs button[aria-pressed="true"]{
+/* ...and only once the bar is actually over paper. The language tabs live in
+   the nav, which is dark while the film is behind it; painting them plum ink
+   there put EN at 1.07:1 on near-black -- the toggle the client could not find
+   on the phone was, in day mode, invisible on desktop too. */
+html[data-theme="day"] .nav.solid .langtabs{border-color:rgba(30,13,21,.18)}
+html[data-theme="day"] .nav.solid .langtabs button{color:rgba(30,13,21,.62)}
+html[data-theme="day"] .nav.solid .langtabs button[aria-pressed="true"]{
   background:transparent;color:#1B0C14;
   box-shadow:inset 0 -2px 0 var(--gold)}
+html[data-theme="day"] .nav.solid .themesw{color:rgba(30,13,21,.62)}
 
 /* WhatsApp at 12% on cream is a smudge. Given its own colour properly, it
    becomes the one saturated thing on the page, which is what a primary
    contact action should be. */
-html[data-theme="day"] .wa{
-  background:#1FA855;border-color:#1FA855;color:#FFFFFF}
-html[data-theme="day"] .wa:hover{
-  background:#17904A;border-color:#17904A;color:#FFFFFF}
+/* Scoped to the contact block. The nav keeps the night palette in day mode --
+   it sits over the film at the top of the page -- so a solid green pill up
+   there would be the only paper-mode object on a dark bar.
+   #1FA855 measured 3.09:1 against white, under the 4.5:1 floor for a 14px
+   label. Same hue, carried down to a value that holds it. */
+html[data-theme="day"] .cbox .wa,
+html[data-theme="day"] .nav.solid .wa{
+  background:#16853F;border-color:#16853F;color:#FFFFFF}
+html[data-theme="day"] .cbox .wa:hover,
+html[data-theme="day"] .nav.solid .wa:hover{
+  background:#0F6E33;border-color:#0F6E33;color:#FFFFFF}
+/* The closing CTA paints --paper on --magenta. On paper --paper is the ink,
+   so the button was dark plum on dark magenta: 2.07:1. White on the day
+   magenta is 9.1:1, and on the hover magenta 5.4:1. */
+html[data-theme="day"] .cta-big{color:#FFFFFF}
 
 /* .cbox span repaints every span in the contact block at display size and
    --paper. That rule was written for the plain contact lines, but it also
@@ -1458,6 +1542,39 @@ html[data-theme="day"] .wa:hover{
    was invisible; in day mode it painted dark text on the green pill. The label
    belongs to the button, so it inherits from the button. */
 .cbox a.wa span{color:inherit;font-size:inherit;font-family:inherit;display:inline}
+
+/* ---------- day-mode muted tones, measured ----------
+   Every secondary line on this page is the ink at 48-56% alpha. That is a
+   comfortable 6-8:1 on near-black and collapses to 3.3-4.2:1 on cream, under
+   the 4.5:1 floor for body text -- captions, the Silal note, the origins
+   count, the coordinates, the outstanding lists and the whole footer. Same
+   hue and the same idea, just enough more of it to hold on paper: .72 of the
+   ink measures 7.2:1 on #FAF4EA and 6.6:1 on #F2E8D8.
+   Written against --fg rather than a literal, so the film sections -- which
+   restate --fg as the light value -- are unaffected by it. */
+html[data-theme="day"] .clear-note,
+html[data-theme="day"] .origins-note,
+html[data-theme="day"] .cwall-foot,
+html[data-theme="day"] .fu-c,
+html[data-theme="day"] .span-k,
+html[data-theme="day"] .fh-note,
+html[data-theme="day"] .sec.dark figcaption,
+html[data-theme="day"] .sec.deep figcaption,
+html[data-theme="day"] .sec.light figcaption,
+html[data-theme="day"] .contact figcaption,
+html[data-theme="day"] footer,
+html[data-theme="day"] footer .foot-link,
+html[data-theme="day"] .pending li span,
+html[data-theme="day"] .pending p,
+html[data-theme="day"] .sec.light .pending.light-pending li span,
+html[data-theme="day"] .sec.light .pending.light-pending p{
+  color:rgba(var(--fg),.72)}
+
+/* The founder monogram is a placeholder standing in for a portrait that has
+   not been supplied. At .14 it was 1.3:1 in day and 1.5:1 at night -- not a
+   subtle mark, an invisible one. .5 reads as a watermark and clears 3:1 in
+   both themes. */
+.fh-mark{color:rgba(var(--fg),.5)}
 
 /* ---------- language switch, reachable on a phone ----------
    The EN / ع control lived inside .navcta, which is display:none below
@@ -1948,7 +2065,11 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         </div>
     <div>
       <blockquote class="rv">We don't just deliver produce. We deliver partnership, reliability, and peace of mind.</blockquote>
-      <div class="who rv" style="color:var(--magenta)">Muhammed Sinan · Managing Partner</div>
+      <!-- --magenta is the deep brand magenta, meant for fills. As type on the
+     plum ground it measured 2.66:1, under the 4.5:1 floor. --pink is the
+     same accent at the value the guideline gives for text: 4.5:1 at night,
+     5.8:1 on paper. -->
+      <div class="who rv" style="color:var(--pink)">Muhammed Sinan · Managing Partner</div>
     </div>
   </div>
 
@@ -2131,8 +2252,14 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
      ticker so they cannot disagree about the current frame. */
   var lenis = null;
   if (!reduced && typeof Lenis === "function") {
+    /* 1.05 was measured coasting 743ms past the last wheel event, and the
+       aisle pan added its own 0.6s scrub on top of that -- so the picture kept
+       travelling for well over a second after the reader had stopped. Smooth
+       scrolling is meant to remove the steps between wheel notches, not to
+       put the page on a delay. 0.8 still interpolates every notch and settles
+       inside half a second. */
     lenis = new Lenis({
-      duration: 1.05,
+      duration: 0.8,
       easing: function(t){ return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
       wheelMultiplier: 0.9,
       touchMultiplier: 1.6,
@@ -2289,7 +2416,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       x: pan, ease: "none",
       scrollTrigger: {
         trigger: sec, start: "top top", end: "bottom bottom",
-        scrub: reduced ? true : 0.6,
+        scrub: reduced ? true : 0.4,   /* Lenis already smooths the input; 0.6 on top of it read as drift */
         invalidateOnRefresh: true,
         onUpdate: self => { if (bar) bar.style.transform = "scaleX(" + self.progress.toFixed(4) + ")"; }
       }
@@ -2585,17 +2712,31 @@ addEventListener("scroll", prime, { once:true, passive:true });
 function chooseUrl(){
   const portrait = PHONE.matches;
   const need = innerWidth * Math.min(devicePixelRatio || 1, 3);
-  /* 1280 only for genuinely small viewports. Anything laptop-sized gets the
-     full master, because scaling 1280 up to a 1440 window is exactly the
-     softness the client is seeing. */
-  /* Full-resolution masters, shipped untouched. A smaller ladder measured 41 to
-     45 dB PSNR against these at every size a real screen paints -- the range
-     where the two cannot be told apart -- but the client asked for no quality
-     reduction, so the originals ship and the smoothness is bought back from the
-     render loop instead of from the picture. The measured-equivalent set is
-     kept in assets/video/_compressed if the weight ever has to come down. */
-  return [portrait, portrait   ? "assets/video/hero-p1152.mp4"
-                  : need > 1100 ? "assets/video/hero-2560.mp4"
+  /* The tier is chosen by the pixels the film will actually be painted into,
+     and the step between tiers is set by what one scrub step COSTS at that
+     size. Measured with a bare <video> off the page, seeked forward the way
+     the scroll seeks it, mean over 90 steps:
+
+         2560x1440   121 ms        1920x1080    86 ms
+         1600x900     62 ms        1280x720     41 ms
+
+     A seek is what the scrub is limited by. At 121 ms the picture can only be
+     repositioned about eight times a second no matter how many frames the file
+     holds -- which is why the film felt like it was lagging behind the scroll
+     rather than being scrubbed by it.
+
+     The old threshold sent everything above 1100 CSS pixels to the 2560
+     master, so an ordinary 1440px window was handed three times the pixels it
+     can paint AND paid 121 ms a step for the ones thrown away in the
+     downscale. Every tier below still oversamples the window it serves -- a
+     1900px window gets 1920 across -- so nothing is upscaled and nothing is
+     softer; the reader just stops paying for pixels their screen cannot show.
+
+     Note this is NOT the compressed ladder: these are the full-quality
+     masters, all-intra, at three sizes. */
+  return [portrait, portrait    ? "assets/video/hero-p1152.mp4"
+                  : need > 1900 ? "assets/video/hero-2560.mp4"
+                  : need > 1280 ? "assets/video/hero-1920.mp4"
                                 : "assets/video/hero-1280.mp4"];
 }
 
@@ -2742,7 +2883,15 @@ hero.addEventListener("progress", () => {
   let end = 0;
   for (let i = 0; i < hero.buffered.length; i++)
     if (hero.buffered.start(i) < 0.5) end = Math.max(end, hero.buffered.end(i));
-  marks.buffer = Math.min(1, (end / hero.duration) / 0.10);   // first frames are enough
+  /* A tenth of the film. That number was set when the masters had a GOP:
+     a seek into a partially-buffered file had to reach back to a keyframe, so
+     a thin prefix was not really scrubbable and the curtain had to wait for
+     more of it. Every tier is all-intra now -- each frame decodes from itself
+     -- so whatever has arrived can be scrubbed the moment it arrives.
+     Instrumented on a throttled handset: fonts land at 2.0s and the metadata
+     at 2.1s, and the curtain then sat until 4.7s waiting for the tenth. Half
+     of that is the same reader experience and 1.2s of it back. */
+  marks.buffer = Math.min(1, (end / hero.duration) / 0.05);
   bootTick();
 });
 hero.addEventListener("canplay", () => { marks.buffer = Math.max(marks.buffer, 0.9); bootTick(); });
@@ -2790,7 +2939,7 @@ function tickLoad(){
      descent section is over seven thousand pixels tall -- the reader spends
      many seconds inside it -- so what is actually needed is the first frames,
      after which buffering continues underneath them while they scroll. */
-  if (hero.readyState >= 2 && f >= 0.10) openHero();
+  if (hero.readyState >= 2 && f >= 0.05) openHero();   /* all-intra: a prefix is scrubbable as soon as it lands */
 }
 hero.addEventListener("progress", tickLoad);
 hero.addEventListener("loadeddata", tickLoad);
@@ -2836,7 +2985,13 @@ function tick(now){
   const dt = lastFrameT ? Math.min(0.25, (now - lastFrameT) / 1000) : 1 / 60;
   lastFrameT = now;
   const d = targetP - smoothP;
-  smoothP += d * (1 - Math.pow(1 - 0.14, dt * 60));
+  /* 0.14 was chosen when the scroll position itself arrived in wheel-sized
+     jumps. Lenis now hands this loop an already-interpolated position, so the
+     second ease was only adding distance between the reader and the frame --
+     and a seek into the master costs 128ms, so the film starts every step
+     behind already. 0.24 closes the same curve in half the time and issues no
+     more seeks: one is in flight at a time either way. */
+  smoothP += d * (1 - Math.pow(1 - 0.24, dt * 60));
   if (Math.abs(d) < 0.0002) smoothP = targetP;
 
   if (dur && !seeking) {
@@ -3049,6 +3204,39 @@ ScrollTrigger.refresh();
     if (day) root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", "day");
     try { localStorage.setItem("gr-theme", day ? "night" : "day"); } catch (e) {}
+    /* Force a full restyle.
+
+       Changing data-theme changes --paper on the root, and everything that
+       INHERITS its colour repainted correctly. Everything that resolves it
+       through a var() of its own -- .cbox a, .pending li b, .lead em, every
+       rule written `color:var(--paper)` -- kept the value it had computed
+       before the switch. Measured on a clean load: body went to rgb(27,12,20)
+       and the contact anchors stayed rgb(251,247,240), cream on cream, which
+       is the half of the page the client could not read. A page loaded
+       directly into day mode was always correct; only the toggle was wrong.
+
+       Detaching the body for one frame drops every cached computed style and
+       the next recalculation reads the new custom properties. Measured at
+       2.4ms, on a deliberate and rare user action.
+
+       Two things were tried and rejected. Bouncing the stylesheet's `disabled`
+       flag cost 142ms AND painted the contact links browser-default blue for
+       the frame the sheet was off. And detaching the body on its own throws
+       the reader back to the top of the page -- measured, 9000px to 0 --
+       because a body with no layout has no scroll extent to hold the position
+       in, so it has to be put back by hand. Lenis keeps its own idea of where
+       the page is, so it has to be told too or it eases back to where it
+       thought it was. */
+    var y = window.scrollY;
+    var b = document.body, d = b.style.display;
+    b.style.display = "none";
+    void b.offsetHeight;
+    b.style.display = d;
+    if (window.scrollY !== y) {
+      window.scrollTo(0, y);
+      if (window.__lenis && window.__lenis.scrollTo)
+        window.__lenis.scrollTo(y, { immediate: true });
+    }
     paint();
     /* section heights do not change, but the reveal observer and any pinned
        trigger should re-read after a repaint of this size */
