@@ -291,6 +291,22 @@ p{margin:0}
   rgba(var(--bgc),.30) 52%,rgba(var(--bgc),.88) 86%,var(--night) 100%)}
 .d-beats{position:absolute;inset:0;z-index:8;display:grid;align-content:center;
   padding:0 clamp(22px,6vw,80px);max-width:min(94vw,720px);pointer-events:none}
+/* A scrim down the side the copy sits on. The film runs from a night city to a
+   sunrise road, so the ground under these words changes from near-black to a
+   pale sky and a white-lit truck within one scroll -- the closing beat had the
+   segment chips and the Arabic sign-off crossing the side of the vehicle,
+   which is the brightest object in the shot. A gradient tied to the column,
+   not to the frame, keeps the type readable at every point of the descent
+   without dimming the picture anywhere the reader is actually looking. */
+.d-beats::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  width:min(100vw,860px);
+  background:linear-gradient(90deg,
+    rgba(var(--bgc),.62) 0%, rgba(var(--bgc),.44) 42%,
+    rgba(var(--bgc),.16) 74%, transparent 100%)}
+html[dir="rtl"] .d-beats::before{right:0;left:auto;
+  background:linear-gradient(270deg,
+    rgba(var(--bgc),.62) 0%, rgba(var(--bgc),.44) 42%,
+    rgba(var(--bgc),.16) 74%, transparent 100%)}
 .d-beat{grid-area:1/1;opacity:0}
 .d-beat .t{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--gold);margin-bottom:14px}
@@ -299,6 +315,18 @@ p{margin:0}
   font-size:clamp(14.5px,1.7vw,17px)}
 .d-beat .ar{font-family:var(--ar);font-size:clamp(15px,2.2vw,23px);color:var(--pink);
   direction:rtl;line-height:1.7;max-width:100%;overflow-wrap:anywhere}
+/* The line that ends the film. It was set at footnote weight under an English
+   sentence; the client asked for it brought forward, and it is the company's
+   own words for what it does, so it closes the descent rather than trailing
+   it. Gold rather than pink: at this size pink on the night ground is the
+   loudest thing on screen, and this should read as a signature. */
+.d-beat .ar-sign{margin-top:26px;font-size:clamp(19px,3vw,34px);line-height:1.55;
+  color:var(--gold);font-weight:500;
+  text-shadow:0 1px 24px rgba(0,0,0,.55)}
+.d-beat .ar-sign::before{content:"";display:block;width:54px;height:1px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+  margin:0 0 16px auto}
+html[dir="rtl"] .d-beat .ar-sign::before{margin:0 auto 16px 0}
 .d-beat .segs{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:20px;list-style:none;padding:0}
   .segs li{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--gold);border:1px solid rgba(var(--goldc),.34);
@@ -502,6 +530,10 @@ p{margin:0}
   text-shadow:0 1px 6px rgba(0,0,0,.7)}
 
 /* ---------- 4 · the schedule chain ---------- */
+/* The closing step lost its placeholder panel, so the row is copy only and
+   should not hold a column open where the picture used to be. */
+.chain li.no-fig{grid-template-columns:auto 1fr}
+.chain li.no-fig figure{display:none}
 .lead em{font-style:normal;color:var(--gold)}
 .chain{list-style:none;margin:clamp(40px,6vw,72px) 0 0;padding:0;
   display:flex;flex-direction:column;gap:1px;
@@ -898,8 +930,13 @@ html[dir="rtl"] .wa{letter-spacing:0;font-family:"GE Dinar One",var(--disp)}
   border-top:1px solid var(--line)}
 .clear li{display:grid;grid-template-columns:auto 1fr;column-gap:16px;row-gap:3px;
   align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}
+/* The index spans both rows, so `align-items:baseline` on the row had nothing
+   sensible to align it to and it settled 11px BELOW the label it belongs to --
+   measured, 8870 against 8859. Pin it to the top of the row and drop it onto
+   the label's own baseline instead. */
 .cl-n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;
-  color:var(--gold);opacity:.9;grid-row:1/3}
+  color:var(--gold);opacity:.9;grid-row:1/3;align-self:start;
+  margin-top:.62em;min-width:18px}
 .clear b{font-family:var(--disp);font-weight:700;text-transform:uppercase;
   letter-spacing:.06em;font-size:clamp(15px,1.7vw,19px);color:var(--paper)}
 .cl-d{font-family:var(--body);font-size:13.5px;line-height:1.6;
@@ -1715,19 +1752,13 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 <!-- layer 4 — the truck, 4am -->
 
     <!-- HUD, only alive during the globe and dive -->
+    <!-- The Convergence coordinate and the Khareef counter were both removed
+         at the client's request. They were instrument-panel detail on a shot
+         that is telling a story, and neither is something a buyer needs.
+         The coordinate still appears once, in the contact block, where
+         somebody actually looking for the unit will go. -->
     <div class="hud" id="dHud" aria-hidden="true">
-      <div class="hud-tl">
-        <span class="hud-lbl">Convergence</span>
-        <span class="hud-val" id="hudCoord">23.58&deg;N 57.80&deg;E</span>
-      </div>
       <div class="hud-tr">
-        <span class="season" id="season" aria-live="polite">
-          <span class="season-dot" aria-hidden="true"></span>
-          <span class="season-txt">
-            <span class="season-k" id="seasonK">&nbsp;</span>
-            <span class="season-v" id="seasonV">&nbsp;</span>
-          </span>
-        </span>
         <span class="hud-lbl">Destination</span>
         <span class="hud-val">Sultanate of Oman</span>
       </div>
@@ -1736,19 +1767,25 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 
     <!-- the four type beats -->
     <div class="d-beats">
+      <!-- These play over a moving film, so they tease and the sections tell.
+           They used to do both: beat 2 carried the Silal paragraph word for
+           word as section 02 states it a few thousand pixels later, beat 0
+           carried the origins detail that Sourcing owns, and beat 4 carried
+           the 28 years that the Record section owns. Same story, told once
+           each now -- which is most of what the client meant by duplication.
+           The coordinate has come out of the labels for the same reason it
+           came out of the HUD. -->
       <article class="d-beat" data-b="0">
         <div class="t">Where it comes from</div>
-        <h1>Twenty-four origins.<br>One country that<br>skips the strait.</h1>
-        <p>From a Batinah farm 143 km away to Buenos Aires 13,733 away. All of it lands at one market, outside the Strait of Hormuz.</p>
+        <h1>Produce from<br>24+ countries,<br>landing in one place.</h1>
       </article>
       <article class="d-beat" data-b="1">
-        <div class="t">23.58°N 57.80°E</div>
+        <div class="t">Khazaen, Barka</div>
         <h2>Everything lands<br>in one place.</h2>
       </article>
       <article class="d-beat" data-b="2">
-        <div class="t">23.58°N 57.80°E · Khazaen, Barka</div>
+        <div class="t">Inside Silal</div>
         <h2>We don't buy at<br>the market.<br>We work inside it.</h2>
-        <p>Our unit sits within Silal, Oman's central fruit and vegetable market. First pick at four in the morning, and no middle step between the trading floor and our cold room.</p>
       </article>
       <article class="d-beat" data-b="3">
         <div class="t">04:00 · The day starts</div>
@@ -1761,8 +1798,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
           <li>Supermarkets</li><li>Restaurants</li>
           <li>Caterers</li><li>Households</li>
         </ul>
-        <p>Twenty-eight years of the same four in the morning.</p>
-        <p class="ar">شريككم في التوريد الطازج</p>
+        <!-- The Arabic line closes the film. The client asked for it brought
+             forward, so it is now the last thing said rather than a footnote
+             under an English sentence that the Record section repeats. -->
+        <p class="ar ar-sign">شريككم في التوريد الطازج</p>
       </article>
     </div>
 
@@ -1790,17 +1829,19 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <h2 class="lead rv">We don't buy at the market. We work inside it.</h2>
       <p class="sub rv">Our unit sits within Silal, Oman's central fruit and vegetable market. We have direct access and first pick, and nothing sits between the trading floor and our cold room. It is why the produce that reaches you is a day fresher than it has any right to be.</p>
       <p class="sub rv" style="margin-top:14px">Silal opened in 2024 and replaced Al Mawaleh as the Sultanate's produce hub. We traded through the old market for most of three decades, and moved with it.</p>
+      <!-- Was four steps. Lands and Inspected described the market's own
+           handling rather than anything Golden Rain does, and the client asked
+           for them out. What is left is the two that are actually theirs. -->
       <ol class="clear rv" aria-label="What happens without the produce leaving the building">
-        <li><span class="cl-n">01</span><b>Lands</b>
-          <span class="cl-d">Trucks reverse into the receiving bays. Nothing has left the site yet.</span></li>
-        <li><span class="cl-n">02</span><b>Inspected</b>
-          <span class="cl-d">Customs, agricultural quarantine and the food-safety lab sit on the same floor plan.</span></li>
-        <li><span class="cl-n">03</span><b>Bought</b>
+        <li><span class="cl-n">01</span><b>Bought</b>
           <span class="cl-d">Our unit is inside the hall, so nothing is driven anywhere and nobody handles it twice.</span></li>
-        <li><span class="cl-n">04</span><b>Cold</b>
+        <li><span class="cl-n">02</span><b>Cold</b>
           <span class="cl-d">Straight into our own room, still inside the building it landed in.</span></li>
       </ol>
-      <p class="clear-note rv">Silal consolidates importers, exporters, wholesalers, customs and laboratory facilities in one destination. That is where the day comes off the clock.</p>
+      <!-- Promoted from a footnote to the point of the section. It was set as
+           a small mono aside under the list, which is where a reader's eye
+           goes last; the client wanted it made the thing you actually read. -->
+      <p class="pullout rv">Everything is under one roof at Silal &mdash; the importers, the wholesalers, customs and the laboratories. That is how a whole day comes off the clock.</p>
       <p class="pullout rv">Your trusted distributor of fresh fruits and vegetables across Oman.</p>
       <p class="tagline rv">Bought by eye, not by list.</p>
     </div>
@@ -1819,8 +1860,8 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="cc-head">
       <div>
         <div class="kicker rv" data-n="03" style="color:var(--gold)">The cold chain</div>
-        <h2 class="lead rv">Sealed at the market.<br>Not opened again<br>until it reaches you.</h2>
-        <p class="sub rv" style="color:rgba(var(--fg),.78)">Hand graded, inspected and packed for table-ready arrival, then moved in a refrigerated fleet built for daily, multi-region delivery. Their phrase for it: farm-fresh to table-ready.</p>
+        <h2 class="lead rv">Once it is cold,<br>it stays cold.</h2>
+        <p class="sub rv" style="color:rgba(var(--fg),.78)">We check and pack it by hand, put it straight into our own cold room, and move it in refrigerated vans. It is not opened again until it gets to you.</p>
       </div>
       <!-- The held temperature is UNCONFIRMED: MASTER-PROMPT.md:139 and
            SITE-CONTENTS.md:202 both record it as unknown. Show the unbroken
@@ -1847,9 +1888,12 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <figcaption>The insulated door, standing open at the bay</figcaption>
       </figure>
       <figure class="rv">
+        <!-- Replaced with the client's own footage of his cold room, shot in
+             4K on his phone and centre-cropped to match the two panels either
+             side of it. -->
         <video data-scrub-in-view src="assets/video/scrub-coldroom.mp4" data-poster="assets/video/posters/scrub-coldroom.jpg" muted playsinline loop
-               preload="none" aria-label="Inside the cold room, evaporator units running above the racking"></video>
-        <figcaption>Through the door. Evaporator units running overhead.</figcaption>
+               preload="none" aria-label="Inside the cold room, pallets stacked to the ceiling and chillers running overhead"></video>
+        <figcaption>Our cold room, filled</figcaption>
       </figure>
       <figure class="rv">
         <video data-scrub-in-view src="assets/video/scrub-stacks.mp4" data-poster="assets/video/posters/scrub-stacks.jpg" muted playsinline loop
@@ -1879,7 +1923,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="cc-head">
       <div>
         <div class="kicker rv" data-n="04">Freshness</div>
-    <h2 class="lead rv">Fresh is not a claim.<br>It is a <em>schedule</em>.</h2>
+    <h2 class="lead rv">Fresh is not a promise.<br>It is a <em>timetable</em>.</h2>
     <p class="standfirst rv">One day, in order.</p>
         <p class="sub rv">Everything below happens between the market opening and your kitchen door.</p>
       </div>
@@ -1910,15 +1954,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <figure><video data-scrub-in-view src="assets/video/play-3724.mp4" data-poster="assets/video/posters/play-3724.jpg" muted playsinline loop preload="none"></video></figure>
       </li>
 
-      <li class="rv">
-        <div class="ch-t">06:45</div>
-        <div class="ch-body">
-          <h3>Into the cold room</h3>
-          <p>The chain closes here and does not open again until it reaches you.</p>
-        </div>
-        <figure><video data-scrub-in-view src="assets/video/scrub-checkin.mp4" data-poster="assets/video/posters/scrub-checkin.jpg" muted playsinline loop preload="none" aria-label="A pallet checked against its paperwork at the cold room door"></video></figure>
-      </li>
-
+      <!-- "Into the cold room" was removed at the client's request. It sat one
+           section below the cold chain, and its line -- "the chain closes here
+           and does not open again until it reaches you" -- was the cold chain
+           headline said a second time. -->
       <li class="rv">
         <div class="ch-t">07:15</div>
         <div class="ch-body">
@@ -1939,13 +1978,15 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
                  aria-label="Fruit and vegetables stacked on a supermarket shelf"></video></figure>
       </li>
 
-      <li class="rv is-last">
+      <!-- The last step has no picture on purpose now: the placeholder panel
+           that used to sit here read as a missing image rather than as an
+           ending. -->
+      <li class="rv is-last no-fig">
         <div class="ch-t">19:30</div>
         <div class="ch-body">
           <h3>On the plate</h3>
           <p>Fifteen hours from the market floor to a table somewhere in the Sultanate. That is the whole job.</p>
         </div>
-        <figure class="ch-none"><span>Where our part ends<br>and yours begins</span></figure>
       </li>
     </ol>
   </div>
@@ -1957,12 +1998,12 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="cc-head">
       <div>
         <div class="kicker rv" data-n="05">Sourcing</div>
-        <h2 class="lead rv">Twenty-four origins.<br>Every one of them printed on a box.</h2>
-        <p class="standfirst rv">Every carton names its own country.</p>
+        <h2 class="lead rv">Produce from 24+ countries,<br>and the box tells you which.</h2>
+        <p class="standfirst rv">Every carton names where it came from.</p>
 
 
       
-        <p class="sub rv">Grade and grower are printed on the box. None of this was arranged for a camera. It is what was standing on the floor.</p>
+        <p class="sub rv">The grade and the grower are printed on the box. Nothing here was set up for a photograph &mdash; it is what was on the floor that morning.</p>
       </div>
       <figure class="span rv" aria-label="Twenty-four origins">
         <div class="span-v">24<i>origins</i></div>
@@ -1983,7 +2024,6 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       </figure>
     </div>
 
-    <p class="pullout rv">We can tell you where any box came from.</p>
   </div>
 </section>
 
@@ -2015,7 +2055,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 <section class="sec light" id="record" data-run="Golden Rain &middot; 06 / The record">
   <div class="inner">
     <div class="kicker rv" data-n="06">The record</div>
-    <h2 class="lead rv">Nearly three decades on the same roads.</h2>
+    <h2 class="lead rv">Nearly three decades<br>on the roads of Oman.</h2>
     <figure class="bay rv">
       <video data-scrub-in-view src="assets/video/scrub-fleetload.mp4" data-poster="assets/video/posters/scrub-fleetload.jpg" muted playsinline loop
              preload="none" aria-label="A row of Golden Rain trucks loaded with produce at the bays"></video>
@@ -2103,10 +2143,9 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="kicker rv" data-n="08">Get in touch</div>
     <h2 class="lead rv">Tell us what you need, and how often.</h2>
 
-    <figure class="cband rv">
-      <video data-scrub-in-view src="assets/video/scrub-contact.mp4" data-poster="assets/video/posters/scrub-contact.jpg" muted playsinline loop
-             preload="none" aria-label="Crated citrus on the trading floor"></video>
-    </figure>
+    <!-- The band video was removed at the client's request. This is the block
+         where somebody decides to call; a full-width film between the headline
+         and the phone number was one more thing to scroll past. -->
 
     <div class="cgrid">
       <div class="cbox rv">
@@ -2837,7 +2876,11 @@ function frame(p){
      over footage of the market at Barka. The client spotted it.
      There is exactly one convergence point and it does not move: their own
      unit at Silal, the same figure the beat copy underneath already states. */
-  if (prev.coord !== MARKET) { coord.textContent = MARKET; prev.coord = MARKET; }
+  /* The readout this drove has been removed. Kept as a guarded no-op rather
+     than deleted, because MARKET is the single source of the coordinate and
+     the contact block still states it -- if the readout ever comes back it
+     must come back reading from here, not from a second hardcoded string. */
+  if (coord && prev.coord !== MARKET) { coord.textContent = MARKET; prev.coord = MARKET; }
 
   beats.forEach((el,i) => {
     const [a,b] = beatWindow(i);
