@@ -2496,7 +2496,17 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
        one -- 38-45 dB PSNR against the master, which is the range where the two
        cannot be told apart. Desktop still gets the untouched files. */
     var PHONE_TIER = matchMedia("(max-width:760px)").matches;
-    var BUDGET = PHONE_TIER ? 9 : 6;
+    /* Nine was one more than any single viewport shows. But the reader does
+       not arrive one viewport at a time -- walking down, cold chain (3),
+       freshness (5) and sourcing (2) are ten clips inside a short span, so the
+       budget was exceeded exactly there and the evictor threw away whatever
+       was furthest, which is the section the reader is about to reach. It
+       warmed, was released, and had to be fetched again on arrival: measured
+       5.5s of still frames in Sourcing on a walk-through, against under 1s
+       when jumping straight to it. That gap is thrash, not bandwidth.
+       Twelve covers that run with nothing to evict, and is still well under
+       the sixteen that had WebKit at 1.3fps. */
+    var BUDGET = PHONE_TIER ? 12 : 8;
     var WARM_AHEAD = PHONE_TIER ? "260% 0px 260% 0px" : "150% 0px 150% 0px";
     var live = [];
 
