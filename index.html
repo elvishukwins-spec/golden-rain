@@ -287,17 +287,38 @@ p{margin:0}
   text-transform:uppercase;color:rgba(var(--fg),.78);
   animation:bootrise 1s cubic-bezier(.22,1,.36,1) .45s both}
 html[dir="rtl"] .boot-name{letter-spacing:0;font-size:14px;font-family:var(--ar);text-transform:none}
-.boot-bar{width:min(220px,54vw);height:1px;background:rgba(var(--fg),.22);overflow:hidden}
-.boot-bar i{display:block;height:100%;width:100%;background:var(--gold);
+/* the bar, and the name made literal above it: a few gold drops falling onto
+   the line while it fills. Transforms and opacity only, seven elements. */
+.boot-load{position:relative;width:min(220px,54vw);padding-top:30px;margin-top:-6px}
+.boot-rain{position:absolute;left:0;right:0;top:0;height:30px;overflow:hidden;pointer-events:none}
+.boot-rain i{position:absolute;top:-22px;width:1.5px;height:18px;border-radius:1px;opacity:0;
+  background:linear-gradient(180deg,rgba(245,167,7,0),var(--gold));box-shadow:0 0 5px rgba(245,167,7,.5);
+  animation:bootrain 1.5s cubic-bezier(.45,0,.85,.45) infinite}
+.boot-rain i:nth-child(1){left:9%;animation-delay:0s;animation-duration:1.55s}
+.boot-rain i:nth-child(2){left:23%;animation-delay:.62s;animation-duration:1.35s}
+.boot-rain i:nth-child(3){left:36%;animation-delay:.21s;animation-duration:1.7s}
+.boot-rain i:nth-child(4){left:50%;animation-delay:.95s;animation-duration:1.45s}
+.boot-rain i:nth-child(5){left:64%;animation-delay:.4s;animation-duration:1.6s}
+.boot-rain i:nth-child(6){left:77%;animation-delay:1.15s;animation-duration:1.4s}
+.boot-rain i:nth-child(7){left:91%;animation-delay:.78s;animation-duration:1.65s}
+@keyframes bootrain{0%{transform:translateY(0);opacity:0}18%{opacity:.95}100%{transform:translateY(52px);opacity:.1}}
+.boot-bar{position:relative;width:100%;height:2px;border-radius:1px;background:rgba(var(--fg),.16);overflow:hidden}
+.boot-bar i{display:block;height:100%;width:100%;background:var(--gold);border-radius:1px;
   transform:scaleX(0);transform-origin:left center;
   transition:transform .35s cubic-bezier(.22,1,.36,1)}
+/* a glint travelling the line */
+.boot-bar::after{content:"";position:absolute;inset:0;width:34%;
+  background:linear-gradient(90deg,transparent,rgba(255,244,214,.55),transparent);
+  transform:translateX(-120%);animation:bootsheen 1.9s ease-in-out .3s infinite}
+@keyframes bootsheen{to{transform:translateX(320%)}}
+html[dir="rtl"] .boot-bar i{transform-origin:right center}
 .boot-pct{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;
   color:rgba(var(--fg),.42)}
 .boot-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding:0 clamp(22px,6vw,60px) clamp(22px,4vh,40px);
   font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
   text-transform:uppercase;color:rgba(var(--fg),.4)}
-@media (prefers-reduced-motion:reduce){.boot-logo,.boot-salam,.boot-name,.boot-bg{animation:none}}
+@media (prefers-reduced-motion:reduce){.boot-logo,.boot-salam,.boot-name,.boot-bg,.boot-rain i{animation:none}.boot-bar::after{display:none}}
 
 /* ---------- 1 · THE DESCENT — globe, dive, Silal, truck, one pin ---------- */
 .descent{position:relative;height:900vh;background:var(--night)}
@@ -359,7 +380,9 @@ html[dir="rtl"] .d-beats::before{right:0;left:auto;
   background:linear-gradient(270deg,
     rgba(var(--bgc),.62) 0%, rgba(var(--bgc),.44) 42%,
     rgba(var(--bgc),.16) 74%, transparent 100%)}
-.d-beat{grid-area:1/1;opacity:0}
+/* opacity and transform are written from the film loop on every frame of a beat
+   change; without a layer of its own each write repainted the headline */
+.d-beat{grid-area:1/1;opacity:0;will-change:opacity,transform}
 .d-beat .t{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--gold);margin-bottom:14px}
 .d-beat h1,.d-beat h2{font-size:clamp(30px,6vw,66px)}
@@ -866,7 +889,6 @@ a{color:inherit}
    putting the copy on frosted panels instead of dimming the picture. */
 .fresh-air .fa{position:absolute;inset:0;display:block;
   background-size:cover;background-position:center 42%;
-  filter:saturate(1.06) contrast(1.02);
   opacity:0;transition:opacity 1.2s ease;transform:scale(1.03)}
 .fresh-air .fa.on{opacity:1}
 /* enough to hold contrast on body copy, not so much that the colour dies */
@@ -882,21 +904,24 @@ a{color:inherit}
 @media(max-width:760px){
       }
 
-/* ---------- frosted panels ----------
-   The copy sits on glass over the produce, so the fruit stays sharp and the
-   words stay legible. backdrop-filter is the whole trick. */
+/* ---------- panels ----------
+   The copy sits on smoked panels over the produce, so the fruit stays sharp
+   and the words stay legible. These were frosted glass (backdrop-filter
+   blur 18px, seven of them over a sticky photograph) until 14 Sep: on the
+   client's own Intel HD 520 the compositor re-blurred every panel on every
+   scroll frame, and Freshness was the section with the most dropped frames
+   on the page. At .88 over .80-plus-blur the two are hard to tell apart side
+   by side; the scroll is not. */
 #fresh .chain > li{
-  background:rgba(var(--bgc),.80);
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);
-  backdrop-filter:blur(18px) saturate(1.2);
+  background:rgba(var(--bgc),.88);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
   border:1px solid var(--line-soft);
   border-radius:3px;
   padding:clamp(20px,3vw,34px);
   margin-bottom:clamp(14px,2vw,22px)}
 #fresh .cc-head{
-  background:rgba(var(--bgc),.78);
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);
-  backdrop-filter:blur(18px) saturate(1.2);
+  background:rgba(var(--bgc),.86);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
   border:1px solid var(--line-soft);
   border-radius:3px;
   padding:clamp(24px,3.4vw,42px)}
@@ -933,7 +958,10 @@ a{color:inherit}
   grid-template-columns:1fr;align-items:center;border:1px solid var(--line-soft);
   background:rgba(var(--fg),.035);padding:clamp(18px,3vw,36px);border-radius:3px}
 @media(min-width:820px){.omap{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}}
-.om-map{width:100%;max-width:480px;margin:0 auto}
+.om-map{position:relative;width:100%;max-width:480px;margin:0 auto}
+/* the moving layer: deliveries, landings, the hub's breath. pointer-events off so the
+   governorates underneath still take the hover and the tap */
+.om-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 /* anchors stay geometric in RTL: the labels sit beside their dots either way */
 .om-svg{display:block;width:100%;height:auto;overflow:visible;direction:ltr;
   font-family:"IBM Plex Mono",monospace}
@@ -963,20 +991,28 @@ a{color:inherit}
 /* not served: drawn so the country is whole, dashed so nobody reads it as a route */
 .om-gov-off{pointer-events:none}
 .om-gov-off .om-shape{fill:rgba(var(--fg),.015);stroke:rgba(var(--fg),.18);stroke-dasharray:.9 .7}
-/* a lit governorate breathes */
-.om-gov.is-on .om-shape{animation:omBreathe 2.4s ease-in-out infinite}
-@keyframes omBreathe{0%,100%{fill:rgba(var(--goldc),.18)}50%{fill:rgba(var(--goldc),.30)}}
+/* no infinite animation on a lit shape: an SVG fill animating is a full repaint
+   of the map on every frame it is on screen. The landing ripple on the canvas
+   does the breathing now. */
 .om-card.is-new{animation:omCard .5s cubic-bezier(.22,1,.36,1)}
 @keyframes omCard{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}
 .om-card-m{min-height:1.5em}
-/* the deliveries themselves: a bright point running each route, longer roads take longer */
-.om-p{fill:var(--paper);opacity:0;transition:opacity .6s;transition-delay:1.6s}
-.omap.on .om-p{opacity:.95}
 .om-hub-core{fill:var(--pink)}
-.om-hub-ring{fill:none;stroke:var(--pink);stroke-width:.3;transform-box:fill-box;transform-origin:center;
-  animation:omPulse 2.6s ease-out infinite}
 .om-hub-t{fill:var(--pink);font-weight:600;opacity:1;transition:none}
-@keyframes omPulse{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.4);opacity:0}}
+/* the places we deliver to, one slow line, spanning both columns */
+.om-ticker{grid-column:1/-1;overflow:hidden;margin-top:calc(-1 * clamp(10px,2.4vw,30px));padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.om-ticker-in{display:inline-flex;align-items:center;white-space:nowrap;width:max-content;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(var(--fg),.58);will-change:transform;animation:omTick 90s linear infinite}
+.om-ticker-in span{margin-inline-end:14px}
+.om-ticker-in i{width:4px;height:4px;border-radius:50%;background:var(--gold);flex:none;margin-inline-end:14px;opacity:.8}
+.omap.is-off .om-ticker-in{animation-play-state:paused}
+@keyframes omTick{to{transform:translateX(-50%)}}
+html[dir="rtl"] .om-ticker-in{animation-name:omTickR;font-family:var(--ar);letter-spacing:0;font-size:13px;text-transform:none}
+@keyframes omTickR{to{transform:translateX(50%)}}
 @media(max-width:560px){.om-t{font-size:3.3px}}
 html[dir="rtl"] .om-svg{font-family:var(--ar)}
 html[dir="rtl"] .om-t{letter-spacing:0;font-size:3px}
@@ -999,16 +1035,18 @@ html[dir="rtl"] .om-card-v{font-family:var(--ar);text-transform:none;font-weight
 @media(prefers-reduced-motion:reduce){
   .om-r{stroke-dashoffset:0;transition:none}
   .om-d,.om-t{opacity:1;transform:none;transition:none}
-  .om-hub-ring{animation:none;opacity:.6}
-  .om-p{display:none}
-  .om-gov.is-on .om-shape{animation:none}
+  .om-fx{display:none}
+  .om-ticker-in{animation:none}
   .om-tw{transition:none}
   .om-card.is-new{animation:none}
 }
 /* ---- Contact: click-to-load map ---- */
 .mapbox{margin:14px 0 0;position:relative;overflow:hidden;border:1px solid var(--line-soft);border-radius:3px;
   background:rgba(var(--fg),.035);min-height:clamp(220px,32vh,340px);display:grid}
-.mapbox iframe{display:block;width:100%;height:clamp(220px,32vh,340px);border:0;filter:saturate(.85)}
+/* no CSS filter on the iframe: a filter over a cross-origin frame makes the compositor
+   re-render that surface on every scroll frame it is on screen -- traced at 15%
+   dropped frames through Contact on the client's laptop, the worst section on the page */
+.mapbox iframe{display:block;width:100%;height:clamp(220px,32vh,340px);border:0}
 .bay{margin:clamp(30px,4vw,52px) 0 clamp(26px,3.5vw,44px);position:relative;overflow:hidden}
 .bay video{display:block;width:100%;height:clamp(300px,52vh,520px);
   object-fit:cover;object-position:center 38%}
@@ -1194,21 +1232,21 @@ html[dir="rtl"] .fu-go{direction:rtl}
 /* the record heading sits inside its own gradient, so lift it clear */
 
 /* ---------- dawn ----------
-   Three real clips of the same yard, an hour apart: the fleet under canopy
-   lights, the same truck in violet pre-dawn, then the sun itself. The argument
+   Two real clips of the same yard, an hour apart: the fleet under canopy
+   lights, then the same truck being loaded in violet pre-dawn. (A third,
+   sunrise, was cut at the client's request on 14 Sep.) The argument
    the whole site makes is that the produce moves before the heat, and this is
    that argument told in light rather than in a sentence. */
-.dawn{position:relative;height:300vh;background:var(--night)}
+.dawn{position:relative;height:200vh;background:var(--night)}
 .dawn-stick{position:sticky;top:0;height:100vh;overflow:hidden}
 .dawn-film{position:absolute;inset:0}
 .dw{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;
   transition:opacity 1.25s cubic-bezier(.22,1,.36,1), transform 1.6s cubic-bezier(.22,1,.36,1);
   transform:scale(1.06)}
 .dw.on{opacity:1;transform:scale(1)}
-/* three different shots want three different centres */
+/* two different shots want two different centres */
 .dw:nth-child(1){object-position:center 44%}
 .dw:nth-child(2){object-position:center 48%}
-.dw:nth-child(3){object-position:center 55%}
 .dawn-veil{position:absolute;inset:0;pointer-events:none;
   background:
     linear-gradient(180deg, rgba(var(--bgc),.86) 0%, rgba(var(--bgc),.22) 26%,
@@ -1225,7 +1263,7 @@ html[dir="rtl"] .fu-go{direction:rtl}
   transition:opacity .5s ease}
 .dawn-steps{list-style:none;position:absolute;z-index:3;left:clamp(22px,6vw,90px);
   right:clamp(22px,6vw,90px);bottom:clamp(48px,7vh,74px);margin:0;padding:0;
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 clamp(14px,3vw,40px)}
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(14px,3vw,40px)}
 .dawn-steps li{padding-top:12px;border-top:1px solid var(--line-soft);
   transition:border-color .5s ease, opacity .5s ease;opacity:.4}
 .dawn-steps li.on{opacity:1;border-top-color:var(--gold)}
@@ -1234,7 +1272,7 @@ html[dir="rtl"] .fu-go{direction:rtl}
 .dawn-steps span{display:block;margin-top:3px;font-family:"IBM Plex Mono",monospace;
   font-size:10.5px;letter-spacing:.08em;color:rgba(var(--fg),.5)}
 @media(max-width:760px){
-  .dawn{height:260vh}
+  .dawn{height:180vh}
   .dawn-copy{bottom:150px;max-width:none}
   .dawn-steps span{display:none}
 }
@@ -1500,9 +1538,7 @@ body{background:var(--plum)}
    Desktop keeps the glass. It has the headroom and the effect is worth it there. */
 @media (max-width: 760px){
   #fresh .chain > li,
-  #fresh .cc-head{
-    -webkit-backdrop-filter:none;backdrop-filter:none;
-    background:rgba(var(--bgc),.93)}
+  #fresh .cc-head{background:rgba(var(--bgc),.93)}
   .nav.solid::before{
     -webkit-backdrop-filter:none;backdrop-filter:none;
     background:rgba(var(--bgc),.97)}
@@ -1510,13 +1546,12 @@ body{background:var(--plum)}
     -webkit-backdrop-filter:none;backdrop-filter:none;
     background:rgba(var(--bgc),.99)}
   .aisle-img{filter:none}
-  .fresh-air .fa{filter:none}
 }
 
 /* Phones with the "reduce motion" switch on get the page without the film
    easing, but they were still paying for every blur above. */
 @media (prefers-reduced-motion: reduce){
-  #fresh .chain > li,#fresh .cc-head,.nav.solid::before,.mobmenu{
+  .nav.solid::before,.mobmenu{
     -webkit-backdrop-filter:none;backdrop-filter:none}
 }
 
@@ -1829,7 +1864,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <img class="boot-logo" src="assets/logo-color.svg" width="982" height="590" alt="Golden Rain Establishment">
     <div class="boot-salam" lang="ar" dir="rtl">السلام عليكم</div>
     <div class="boot-name">Welcome to Golden Rain</div>
-    <div class="boot-bar"><i id="bootFill"></i></div>
+    <div class="boot-load" aria-hidden="true">
+      <span class="boot-rain"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <div class="boot-bar"><i id="bootFill"></i></div>
+    </div>
     <div class="boot-pct" id="bootPct">0%</div>
   </div>
   <div class="boot-foot">
@@ -2174,7 +2212,6 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="dawn-film" aria-hidden="true">
       <video class="dw on" data-scrub-in-view src="assets/video/dawn-1.mp4" data-poster="assets/video/posters/dawn-1.jpg" muted playsinline loop preload="none"></video>
       <video class="dw"    data-scrub-in-view src="assets/video/dawn-2.mp4" data-poster="assets/video/posters/dawn-2.jpg" muted playsinline loop preload="none"></video>
-      <video class="dw"    data-scrub-in-view src="assets/video/dawn-3.mp4" data-poster="assets/video/posters/dawn-3.jpg" muted playsinline loop preload="none"></video>
     </div>
     <div class="dawn-veil" aria-hidden="true"></div>
     <div class="dawn-copy">
@@ -2184,7 +2221,6 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <ol class="dawn-steps" aria-hidden="true">
       <li class="on"><b>Night</b><span>The fleet in, before anyone arrives</span></li>
       <li><b>Loading</b><span>Pallet by pallet, stacked to the roof</span></li>
-      <li><b>Sunrise</b><span>Three trucks loaded, doors open</span></li>
     </ol>
   </div>
 </section>
@@ -2200,10 +2236,13 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
          (public domain) as inline SVG, 20 KB, no third party, both themes and
          both languages. Routes draw in once when the figure scrolls into
          view; delivery pulses then run along them; hovering or tapping a
-         governorate names it in the card. A quiet tour steps through them
-         until the reader touches the map. -->
-    <figure class="omap rv" id="omap" aria-label="Map of Oman showing deliveries from Silal, Barka to ten governorates and their towns">
+         governorate names it in the card. The deliveries, the ripple where one
+         lands and the breathing at the hub are drawn on a canvas over the SVG
+         from one loop that only runs while the map is on screen (see the
+         script); the card follows whichever delivery landed last. -->
+    <figure class="omap rv is-off" id="omap" aria-label="Map of Oman showing deliveries from Silal, Barka to ten governorates and their towns">
       <div class="om-map">
+<canvas class="om-fx" aria-hidden="true"></canvas>
 <svg class="om-svg" viewBox="0 0 108 142" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="group" aria-labelledby="omTitle">
   <title id="omTitle">Map of Oman: one unit at Silal, Barka, deliveries to ten governorates and their towns</title>
   <g class="om-gov om-gov-off" aria-hidden="true"><path class="om-shape" d="M4.1,105.6L4.0,105.3L5.4,104.8L7.6,104.0L9.8,103.3L11.9,102.5L14.1,101.7L16.3,100.9L18.5,100.1L20.6,99.3L22.8,98.6L25.0,97.8L27.2,97.0L29.3,96.2L31.5,95.4L33.7,94.7L35.9,93.9L38.0,93.1L40.2,92.3L42.1,91.6L42.5,90.3L42.6,90.0L42.9,89.3L43.2,88.1L43.7,86.5L44.3,84.7L44.9,82.7L45.6,80.5L46.3,78.2L46.8,76.5L47.0,76.8L62.5,103.0L73.5,106.0L70.5,106.5L68.9,107.0L66.8,107.9L65.9,108.5L65.4,108.8L65.1,109.0L65.0,109.3L64.9,109.4L63.5,110.8L63.3,111.3L63.2,112.0L63.3,112.4L63.3,112.6L63.3,112.7L63.1,113.0L63.0,113.2L62.9,113.5L62.9,113.6L62.9,114.2L62.8,114.8L62.1,116.4L62.3,116.6L62.3,116.9L62.1,117.2L61.8,117.4L61.3,117.7L61.0,117.8L60.6,118.5L60.5,118.6L60.4,118.7L60.3,118.7L59.7,119.4L59.6,119.5L59.7,119.8L59.5,119.8L57.5,119.6L57.3,119.6L56.9,119.8L56.6,119.9L55.5,119.8L55.3,119.8L54.4,120.1L54.0,120.3L50.7,120.4L49.4,120.8L49.2,120.8L49.1,120.8L49.0,120.9L48.9,120.9L48.9,121.0L48.6,121.0L48.6,121.0L48.2,121.1L48.1,121.2L47.9,121.4L47.7,121.9L47.6,122.2L47.4,122.4L47.4,122.5L47.2,123.1L47.1,123.1L46.9,123.3L45.8,124.4L45.4,125.0L45.3,125.3L45.3,125.6L45.3,126.0L45.5,126.2L45.9,126.4L46.1,126.7L46.2,127.0L46.2,127.6L46.2,127.9L45.6,128.6L45.6,128.7L45.6,128.9L45.6,129.1L45.7,129.2L45.8,129.2L45.8,129.3L45.7,129.5L45.6,129.6L45.3,129.7L45.2,129.8L45.1,129.9L45.1,130.0L45.0,130.3L44.9,130.5L44.9,130.6L44.8,130.7L44.4,130.8L44.2,130.9L44.2,131.1L44.1,131.3L44.0,131.4L43.8,131.5L43.3,132.1L42.8,132.5L42.7,132.5L42.5,132.3L42.4,132.4L42.2,132.6L42.1,132.7L41.9,132.8L41.7,132.8L41.5,132.9L41.4,132.8L41.2,133.0L40.9,133.1L40.4,133.2L40.0,133.4L39.8,133.4L39.6,133.2L39.5,133.3L39.2,133.2L39.1,133.3L38.7,133.0L38.6,133.1L38.5,132.8L38.4,132.6L38.3,132.4L37.7,132.3L37.4,132.2L37.2,132.2L37.1,132.2L36.8,132.2L36.7,132.3L36.2,132.2L36.0,132.2L35.9,132.2L35.6,132.3L35.6,132.4L35.0,132.2L34.7,132.2L34.4,132.4L34.3,132.3L34.2,132.3L31.8,132.5L30.8,132.5L30.6,132.6L30.0,132.9L29.9,133.0L29.8,133.1L29.8,133.2L29.8,133.3L29.9,133.4L29.8,133.6L29.6,133.7L29.6,133.8L29.5,133.9L29.1,134.0L28.6,134.0L27.8,134.2L27.5,134.2L27.3,134.3L27.1,134.5L26.8,134.6L26.6,134.5L26.3,134.7L26.0,134.9L25.7,135.3L25.6,135.5L25.5,135.7L25.3,135.8L24.8,136.0L24.4,136.1L22.4,136.2L21.3,136.3L19.2,137.0L18.1,137.6L17.3,135.7L16.5,133.9L15.7,132.0L15.0,130.2L14.5,129.0L14.3,128.8L14.1,128.8L13.6,128.7L13.4,128.6L13.5,128.6L13.5,128.6L13.6,128.6L13.2,127.6L12.6,126.3L12.1,125.0L11.5,123.6L11.0,122.3L10.4,121.0L9.9,119.7L9.3,118.3L8.8,117.0L8.3,115.7L7.7,114.4L7.2,113.0L6.6,111.7L6.1,110.4L5.5,109.1L5.0,107.7L4.4,106.4L4.1,105.6ZM53.0,126.0L53.0,125.8L53.0,125.8L53.0,125.8L53.1,125.7L53.2,125.6L53.4,125.6L53.6,125.7L53.7,125.8L53.7,125.8L53.5,125.9L53.2,125.9L53.0,126.0L53.0,126.0ZM55.8,125.0L55.8,125.0L55.9,125.2L55.9,125.2L56.0,125.4L56.2,125.5L56.3,125.6L55.9,125.8L55.7,125.9L55.5,126.0L55.0,125.9L54.8,125.9L54.7,125.6L55.0,125.4L55.5,125.2L55.8,125.0Z"/></g>
@@ -2268,9 +2307,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <circle class="om-d" style="--i:9" cx="58.6" cy="92.1" r="1.1"/>
     <text class="om-t" style="--i:9" x="56.0" y="93.0" text-anchor="end">Haima</text>
   </g>
-  <g class="om-pulses" aria-hidden="true"><circle class="om-p" r=".8"><animateMotion dur="2.4s" begin="0.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-0"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="2.6s" begin="0.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-1"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="2.6s" begin="1.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-2"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="2.9s" begin="1.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-3"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="3.0s" begin="2.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-4"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="3.0s" begin="2.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-5"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="3.4s" begin="3.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-6"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="3.4s" begin="3.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-7"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="4.1s" begin="4.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-8"/></animateMotion></circle><circle class="om-p" r=".8"><animateMotion dur="4.6s" begin="4.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-9"/></animateMotion></circle></g>
   <g class="om-hub" transform="translate(78.0,42.5)" aria-hidden="true">
-    <circle class="om-hub-ring" r="2.6"/>
     <circle class="om-hub-core" r="1.5"/>
   </g>
   <text class="om-t om-hub-t" x="81.4" y="39.9" text-anchor="start">Silal, Barka</text>
@@ -2290,9 +2327,11 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
           <li><i class="om-lg om-lg-d"></i><span>Capitals and towns we deliver to</span></li>
         </ul>
       </div>
+      <!-- the same 46 places the card names, as a slow line under the map -->
+      <div class="om-ticker" aria-hidden="true"><div class="om-ticker-in" id="omTicker"><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Khasab</span><i></i><span>Bukha</span><i></i><span>Dibba</span><i></i><span>Madha</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Haima</span><i></i><span>Duqm</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Khasab</span><i></i><span>Bukha</span><i></i><span>Dibba</span><i></i><span>Madha</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Haima</span><i></i><span>Duqm</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i></div></div>
     </figure>
 
-    <div class="figs">
+    <div class="figs" id="recordFigs">
       <div class="fig rv"><span class="k">28</span><span class="l">years supplying Oman</span></div>
       <div class="fig rv"><span class="k">6</span><span class="l">markets served daily</span></div>
       <div class="fig rv"><span class="k">2&times;</span><span class="l">deliveries a week, ten governorates</span></div>
@@ -2582,8 +2621,8 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
   };
   window.__paintSeason();
 
-  /* The dawn section moves through three real clips of the same yard as you
-     scroll it: canopy lights, violet pre-dawn, then the sun. The copy and the
+  /* The dawn section moves through two real clips of the same yard as you
+     scroll it: canopy lights, then the loading in violet pre-dawn. The copy and the
      step markers follow the light rather than a timer, so what you read always
      matches what you are looking at. */
   (function(){
@@ -2595,11 +2634,9 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     /* written by script, so the dictionary never sees it: both languages here */
     const says  = document.documentElement.lang === "ar"
       ? ["لم يستيقظ أحد بعد. الساحة مستيقظة، ونحن كذلك.",
-         "من غرفة التبريد إلى الصندوق المبرّد، دون دقيقةٍ دافئة بينهما.",
-         "وحين يصل الحر، يكون الصباح قد صار لغيرنا."]
+         "من غرفة التبريد إلى الصندوق المبرّد، دون دقيقةٍ دافئة بينهما."]
       : ["Nobody is awake yet. The yard is, and so are we.",
-         "Cold room to cold body, without one warm minute in between.",
-         "By the time the heat arrives, it is somebody else's morning."];
+         "Cold room to cold body, without one warm minute in between."];
     let at = -1;
     /* The three dawn clips are stacked and cross-faded on opacity, so all three
        sit inside the viewport at once and the generic in-view handler started
@@ -2641,7 +2678,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     show(0);
     ScrollTrigger.create({
       trigger: sec, start: "top top", end: "bottom bottom",
-      onUpdate: self => show(Math.min(2, Math.floor(self.progress * 3.0001)))
+      onUpdate: self => show(Math.min(1, Math.floor(self.progress * 2.0001)))
     });
   })();
 
@@ -3144,6 +3181,11 @@ function bootTick(){
       /* release the hero a beat into the lift, so the two overlap rather than
          happening one after the other */
       setTimeout(() => document.documentElement.classList.add("boot-open"), 180);
+      /* and once the curtain has lifted, take it out of the document. It was
+         only visibility:hidden, and the rain and the glint on its bar kept
+         animating behind every scroll frame for the life of the page --
+         traced at 984 style invalidations in twelve wheel notches. */
+      setTimeout(() => { if (boot.parentNode) boot.parentNode.removeChild(boot); }, 1700);
       ScrollTrigger.refresh();
     }, 320);
   }
@@ -3232,7 +3274,7 @@ setTimeout(openHero, 12000);
    seek to real frame boundaries, because a 30fps film has only 30 distinct
    frames per second to show. The loop parks itself when nothing is moving. */
 const FPS = 24;   /* the masters are all-intra at 24fps: every frame a keyframe */
-let targetP = 0, smoothP = 0, rafId = 0, lastSeek = -1, seeking = false, seekGuard = 0;
+let targetP = 0, smoothP = 0, rafId = 0, lastSeek = -1, seeking = false, seekGuard = 0, chasing = false;
 let lastFrameT = 0;
 
 /* How long a seek is allowed to take before we stop waiting for it. Measured
@@ -3248,7 +3290,9 @@ hero.addEventListener("seeked",  () => {
   if (seekStart) seekAvg = seekAvg * 0.7 + (performance.now() - seekStart) * 0.3;
   clearTimeout(seekGuard); seeking = false;
 });
-hero.addEventListener("error",   () => { clearTimeout(seekGuard); seeking = false; });
+hero.addEventListener("error",   () => { clearTimeout(seekGuard); seeking = false; chasing = false; });
+hero.addEventListener("waiting", () => { if (chasing) { hero.pause(); chasing = false; } });
+hero.addEventListener("ended",   () => { chasing = false; });
 
 function tick(now){
   /* Ease toward the target in WALL-CLOCK time, not in frames.
@@ -3270,9 +3314,27 @@ function tick(now){
   smoothP += d * (1 - Math.pow(1 - 0.24, dt * 60));
   if (Math.abs(d) < 0.0002) smoothP = targetP;
 
+  /* Forward, and within reach: PLAY toward the target instead of seeking.
+     A seek is a decoder flush and one frame decoded on demand, and however
+     fast the masters make that, it is one picture per round trip -- measured
+     on this laptop at a 1920 tier, the film changed picture 34 times a second
+     while the page moved, but a tenth of those changes waited 67ms or more,
+     and that is the judder the client felt in the opener. Playing streams the
+     frames in order at whatever rate closes the gap, so the motion is the
+     film's own 24fps instead of a queue of seeks. Scrolling back still seeks
+     (a video cannot play backwards), as does any jump too far to chase. */
   if (dur && !seeking) {
-    const t = Math.round(smoothP * (dur - 0.05) * FPS) / FPS;
-    if (t !== lastSeek) {
+    const T = smoothP * (dur - 0.05);
+    const gap = T - hero.currentTime;
+    if (!reduced && gap > 1.5 / FPS && gap < 2.5) {
+      const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
+      if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
+      if (hero.paused) { chasing = true; hero.play().catch(() => { chasing = false; }); }
+      lastSeek = -1;
+    } else {
+      if (chasing || !hero.paused) { hero.pause(); chasing = false; try { hero.playbackRate = 1; } catch(e){} }
+      const t = Math.round(T * FPS) / FPS;
+      if (Math.abs(gap) > 1.5 / FPS && t !== lastSeek) {
       lastSeek = t;
       /* A seek to the position the video already holds completes instantly and
          fires no "seeked" event. The old code still set seeking = true, so the
@@ -3297,6 +3359,7 @@ function tick(now){
         seekGuard = setTimeout(() => { seeking = false; wake(); },
                                Math.min(600, Math.max(150, seekAvg * 3)));
       }
+      }
     }
   }
   frame(smoothP);
@@ -3304,7 +3367,9 @@ function tick(now){
   /* keep animating while the routes are visible so the vessels keep sailing;
      everywhere else the loop still parks and costs nothing */
   const routesLive = false;
-  if (smoothP === targetP && !seeking && !routesLive) { rafId = 0; return; }
+  /* while the film is still chasing the target, the loop has to stay up to
+     stop it when it arrives */
+  if (smoothP === targetP && !seeking && !chasing && !routesLive) { rafId = 0; return; }
   rafId = requestAnimationFrame(tick);
 }
 /* Restarting a parked loop must not count the idle gap as elapsed frame time,
@@ -3338,52 +3403,198 @@ ScrollTrigger.refresh();
 
 <script>
 (function(){
-  /* The supply map draws its routes once, the first time it is on screen;
-     after that a quiet tour steps through the governorates until the reader
-     hovers or taps one, and the card beside the map names whatever is lit. */
+  /* The supply map draws its routes once, the first time it is on screen.
+     Everything that MOVES after that -- the deliveries running the routes,
+     the ripple where one lands, the breath at the hub -- is drawn on a canvas
+     laid over the SVG, from one rAF loop that only runs while the figure is
+     on screen. It used to be SMIL animateMotion and a CSS keyframe inside the
+     SVG: traced at 1,250 layout invalidations in twelve wheel notches while
+     the reader was in Freshness, five thousand pixels away, because SVG
+     animations tick whether or not anyone can see them, and every tick is a
+     main-thread repaint. The card follows the deliveries: when one lands and
+     nobody has touched the map, that governorate is the one named. */
   var om = document.getElementById("omap");
-  if (om) {
-    var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var govs = [].slice.call(om.querySelectorAll(".om-gov:not(.om-gov-off)"));   /* Dhofar is drawn, not served */
-    var cardK = document.getElementById("omCardK"), cardV = document.getElementById("omCardV"), cardM = document.getElementById("omCardM");
-    var isAr = document.documentElement.lang === "ar";
-    var places = govs.reduce(function(t, g){ return t + 1 + (g.dataset.towns ? g.dataset.towns.split(" · ").length : 0); }, 0);
-    var AR_DIGITS = function(n){ return String(n).replace(/\d/g, function(d){ return "٠١٢٣٤٥٦٧٨٩"[d]; }); };
-    var DEF = isAr ? ["عشر محافظات", AR_DIGITS(places) + " مكاناً", "مرتين في الأسبوع من سلال"]
-                   : ["Ten governorates", places + " places", "Twice a week from Silal"];
-    var touched = false, tour = null, k = 0, inView = false;
-    function show(i){
-      govs.forEach(function(g, n){ g.classList.toggle("is-on", n === i); });
-      if (i < 0) { cardK.textContent = DEF[0]; cardV.textContent = DEF[1]; cardM.textContent = DEF[2]; return; }
-      var g = govs[i];
-      cardK.textContent = isAr ? g.dataset.ar : g.dataset.en + " Governorate";
-      cardV.textContent = isAr ? g.dataset.capAr : g.dataset.cap;
-      cardM.textContent = isAr ? g.dataset.townsAr : g.dataset.towns;
-      var card = document.getElementById("omCard");
-      card.classList.remove("is-new"); void card.offsetWidth; card.classList.add("is-new");
-    }
-    function stopTour(){ touched = true; if (tour) { clearInterval(tour); tour = null; } }
-    function startTour(){
-      if (touched || reduce || tour || !inView) return;
-      tour = setInterval(function(){ show(k % govs.length); k++; }, 2000);
-    }
-    function pauseTour(){ if (tour) { clearInterval(tour); tour = null; } }
-    govs.forEach(function(g, n){
-      var pick = function(){ stopTour(); show(n); };
-      g.addEventListener("mouseenter", pick);
-      g.addEventListener("focus", pick);
-      g.addEventListener("click", pick);
-      g.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
-    });
-    om.querySelector(".om-map").addEventListener("mouseleave", function(){ if (touched) show(-1); });
-    function on(){ om.classList.add("on"); setTimeout(startTour, 1400); }
-    if (reduce || !window.ScrollTrigger) { inView = true; on(); }
-    else ScrollTrigger.create({ trigger: om, start: "top 78%", once: true, onEnter: function(){ inView = true; on(); } });
-    /* the tour only runs while the map is actually on screen */
-    if ("IntersectionObserver" in window) new IntersectionObserver(function(es){
-      es.forEach(function(e){ inView = e.isIntersecting; if (inView && om.classList.contains("on")) startTour(); else if (!inView) pauseTour(); });
-    }, { threshold: 0.2 }).observe(om);
+  if (!om) return;
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var svg = om.querySelector(".om-svg");
+  var govs = [].slice.call(om.querySelectorAll(".om-gov:not(.om-gov-off)"));   /* Dhofar is drawn, not served */
+  var cardK = document.getElementById("omCardK"), cardV = document.getElementById("omCardV"), cardM = document.getElementById("omCardM");
+  var isAr = document.documentElement.lang === "ar";
+  var places = govs.reduce(function(t, g){ return t + 1 + (g.dataset.towns ? g.dataset.towns.split(" · ").length : 0); }, 0);
+  var AR_DIGITS = function(n){ return String(n).replace(/\d/g, function(d){ return "٠١٢٣٤٥٦٧٨٩"[d]; }); };
+  var DEF = isAr ? ["عشر محافظات", AR_DIGITS(places) + " مكاناً", "مرتين في الأسبوع من سلال"]
+                 : ["Ten governorates", places + " places", "Twice a week from Silal"];
+  var touched = false, inView = false, lit = false, lastShow = 0;
+
+  function show(i){
+    govs.forEach(function(g, n){ g.classList.toggle("is-on", n === i); });
+    if (i < 0) { cardK.textContent = DEF[0]; cardV.textContent = DEF[1]; cardM.textContent = DEF[2]; return; }
+    var g = govs[i];
+    cardK.textContent = isAr ? g.dataset.ar : g.dataset.en + " Governorate";
+    cardV.textContent = isAr ? g.dataset.capAr : g.dataset.cap;
+    cardM.textContent = isAr ? g.dataset.townsAr : g.dataset.towns;
+    var card = document.getElementById("omCard");
+    card.classList.remove("is-new"); void card.offsetWidth; card.classList.add("is-new");
   }
+  govs.forEach(function(g, n){
+    var pick = function(){ touched = true; show(n); };
+    g.addEventListener("mouseenter", pick);
+    g.addEventListener("focus", pick);
+    g.addEventListener("click", pick);
+    g.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+  });
+  /* the mouse leaving hands the card back to the deliveries; a tap keeps it,
+     since nothing "leaves" on a phone */
+  om.querySelector(".om-map").addEventListener("mouseleave", function(){
+    if (touched) { touched = false; show(-1); lastShow = performance.now(); }
+  });
+
+  /* the ticker under the map, in whichever language this page is */
+  var tk = document.getElementById("omTicker");
+  if (tk) {
+    var names = [];
+    govs.forEach(function(g){
+      names.push(isAr ? g.dataset.capAr : g.dataset.cap);
+      (isAr ? g.dataset.townsAr : g.dataset.towns).split(" · ").forEach(function(t){ names.push(t); });
+    });
+    var half = names.map(function(t){ return "<span>" + t + "</span><i></i>"; }).join("");
+    tk.innerHTML = half + half;
+  }
+
+  /* ---- the moving layer ---- */
+  var cv = om.querySelector(".om-fx"), ctx = cv && cv.getContext && cv.getContext("2d");
+  var vb = svg.viewBox.baseVal, VW = vb.width, VH = vb.height;
+  var N = 48;
+  var routes = govs.map(function(g, i){
+    var d = g.querySelector(".om-r").getAttribute("d");
+    var n = d.match(/-?[\d.]+/g).map(Number);          /* M x0,y0 Q cx,cy x1,y1 */
+    var pts = [], len = [0];
+    for (var k = 0; k <= N; k++) {
+      var t = k / N, u = 1 - t;
+      pts.push([u*u*n[0] + 2*u*t*n[2] + t*t*n[4], u*u*n[1] + 2*u*t*n[3] + t*t*n[5]]);
+      if (k) len.push(len[k-1] + Math.hypot(pts[k][0]-pts[k-1][0], pts[k][1]-pts[k-1][1]));
+    }
+    var L = len[N];
+    return { pts: pts, len: len, L: L, end: pts[N], i: i,
+             dur: 2400 + L * 70,                 /* ms on the road: longer roads take longer */
+             wait: 1400 + (i * 733) % 2200,      /* each waits a different while at the hub */
+             off: i * 590,                       /* so they never all leave together */
+             landed: false };
+  });
+  var hub = routes[0].pts[0];
+  /* point at a fraction of the road's LENGTH, so a delivery does not slow on the bends */
+  function at(r, f){
+    var d = f * r.L, lo = 1, hi = N;
+    while (lo < hi) { var m = (lo + hi) >> 1; if (r.len[m] < d) lo = m + 1; else hi = m; }
+    var a = r.pts[lo-1], b = r.pts[lo], seg = r.len[lo] - r.len[lo-1] || 1, t = (d - r.len[lo-1]) / seg;
+    return [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t];
+  }
+  var col = { gold: "#F5A707", pink: "#E73391", paper: "#FBF6EC" };
+  function palette(){
+    var cs = getComputedStyle(om);
+    col.gold = cs.getPropertyValue("--gold").trim() || col.gold;
+    col.pink = cs.getPropertyValue("--pink").trim() || col.pink;
+    col.paper = cs.getPropertyValue("--paper").trim() || col.paper;
+  }
+  var DPR = 1, SC = 1;
+  function size(){
+    if (!cv) return;
+    var r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(r.width * DPR); cv.height = Math.round(r.height * DPR);
+    SC = cv.width / VW;
+  }
+  var raf = 0, t0 = 0, tPrev = 0, T = 0;
+  function easeIO(t){ return t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2; }
+  function ring(x, y, r, c, a, w){ ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.strokeStyle = c; ctx.globalAlpha = a; ctx.lineWidth = w; ctx.stroke(); }
+  function dot(x, y, r, c, a){ ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fillStyle = c; ctx.globalAlpha = a; ctx.fill(); }
+  function land(i, now){
+    /* the card follows the landings, but not faster than a person can read */
+    if (touched || now - lastShow < 2600) return;
+    lastShow = now; show(i);
+  }
+  function draw(now){
+    raf = 0;
+    if (!inView || !lit || document.hidden) { tPrev = 0; return; }
+    /* accumulate our own clock, so a pause off screen does not make the
+       deliveries jump when the reader comes back */
+    if (tPrev) T += Math.min(80, now - tPrev);
+    tPrev = now;
+    ctx.setTransform(SC, 0, 0, SC, 0, 0);            /* draw in viewBox units */
+    ctx.clearRect(0, 0, VW, VH);
+    ctx.lineCap = "round";
+    /* the hub breathes: one ring leaves every 2.6s */
+    var ph = (T % 2600) / 2600;
+    ring(hub[0], hub[1], 1.4 + ph * 5.2, col.pink, (1 - ph) * .85, .32);
+    for (var i = 0; i < routes.length; i++) {
+      var r = routes[i], cyc = r.dur + r.wait, p = (T + r.off) % cyc;
+      if (p < r.dur) {
+        r.landed = false;
+        var f = easeIO(p / r.dur), head = at(r, f);
+        /* the tail: eight short strokes behind the head, fading and thinning */
+        for (var k = 8; k >= 1; k--) {
+          var fb = f - (k - 1) * .02, fa = f - k * .02;
+          if (fb <= 0) continue;
+          var A = at(r, Math.max(0, fa)), B = at(r, fb);
+          ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
+          ctx.strokeStyle = col.gold; ctx.globalAlpha = (1 - k / 9) * .8; ctx.lineWidth = .3 + (1 - k / 9) * .55; ctx.stroke();
+        }
+        dot(head[0], head[1], 2.3, col.gold, .16);
+        dot(head[0], head[1], .95, col.gold, 1);
+        dot(head[0], head[1], .42, col.paper, .95);
+      } else {
+        var since = p - r.dur;
+        if (!r.landed) { r.landed = true; land(i, now); }
+        if (since < 1000) { var q = since / 1000; ring(r.end[0], r.end[1], 1.2 + q * 4.2, col.gold, (1 - q) * .85, .34); }
+        if (since < 380) dot(r.end[0], r.end[1], 1.1 + (1 - since / 380) * .9, col.paper, .9 * (1 - since / 380));
+      }
+    }
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(draw);
+  }
+  function loop(){ if (ctx && !raf && !reduce && inView && lit && !document.hidden) raf = requestAnimationFrame(draw); }
+
+  function on(){ lit = true; om.classList.add("on"); palette(); size(); loop(); }
+  if (reduce || !window.ScrollTrigger) { inView = true; on(); }
+  else ScrollTrigger.create({ trigger: om, start: "top 78%", once: true, onEnter: on });
+  if ("IntersectionObserver" in window) new IntersectionObserver(function(es){
+    es.forEach(function(e){ inView = e.isIntersecting; om.classList.toggle("is-off", !inView); if (inView) loop(); });
+  }, { threshold: 0 }).observe(om);
+  else { inView = true; om.classList.remove("is-off"); }
+  document.addEventListener("visibilitychange", loop);
+  if ("ResizeObserver" in window) new ResizeObserver(function(){ size(); }).observe(svg);
+  else addEventListener("resize", size);
+  if ("MutationObserver" in window) new MutationObserver(palette).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
+<script>
+(function(){
+  /* the three figures under the map count up once, as they come into view */
+  var box = document.getElementById("recordFigs");
+  if (!box || !("IntersectionObserver" in window)) return;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var AR = "٠١٢٣٤٥٦٧٨٩";
+  var ks = [].slice.call(box.querySelectorAll(".k")).map(function(el){
+    var m = el.textContent.match(/^([0-9٠-٩]+)(.*)$/);
+    if (!m) return null;
+    var ar = /[٠-٩]/.test(m[1]);
+    var n = parseInt(ar ? m[1].replace(/[٠-٩]/g, function(d){ return AR.indexOf(d); }) : m[1], 10);
+    return { el: el, n: n, tail: m[2], ar: ar };
+  }).filter(Boolean);
+  var fmt = function(k, v){ var t = String(v); return (k.ar ? t.replace(/\d/g, function(d){ return AR[d]; }) : t) + k.tail; };
+  new IntersectionObserver(function(es, io){
+    if (!es.some(function(e){ return e.isIntersecting; })) return;
+    io.disconnect();
+    var t0 = 0;
+    var step = function(now){
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / 1100), e = 1 - Math.pow(1 - p, 3);
+      ks.forEach(function(k){ k.el.textContent = fmt(k, Math.round(k.n * e)); });
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, { threshold: .4 }).observe(box);
 })();
 </script>
 <script src="assets/i18n-ar.js"></script>
