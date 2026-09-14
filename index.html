@@ -44,6 +44,7 @@
 <meta name="twitter:image" content="https://goldenrainoman.om/assets/img/og-card.jpg">
 
 <link rel="icon" href="assets/logo-color.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="assets/img/boot-dawn.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/video/hero-poster.jpg">
 <link rel="apple-touch-icon" href="assets/img/og-card.jpg">
 
@@ -246,11 +247,8 @@ p{margin:0}
   text-decoration:none;font-size:15px}
 
 /* ---------- boot ---------- */
-.boot{position:fixed;inset:0;z-index:120;
-  background:
-    radial-gradient(120% 90% at 50% 38%, rgba(var(--pinkc),.20) 0%, transparent 62%),
-    radial-gradient(90% 70% at 50% 100%, rgba(var(--goldc),.10) 0%, transparent 60%),
-    linear-gradient(#2A0A1E 0%, var(--night-2) 48%, #12040C 100%);
+.boot{position:fixed;inset:0;z-index:120;overflow:hidden;
+  background:#1A0712 url("data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xABtAAEBAQAAAAAAAAAAAAAAAAAGBAUBAQEBAQEAAAAAAAAAAAAAAAUGAgQDEAACAgAHAAMBAAAAAAAAAAACAQADgUFxMSEFEZEz8AQRAAICAQMEAwEAAAAAAAAAAAIBAwARUgQxcUKRFEFRgSH/wAARCAAMACADARIAAhIAAxIA/9oADAMBAAIRAxEAPwAKP8pfmpSV9q2Nr4m3uEr7+vFpVSUBXh9qbVaA68ieWvswTtMtyJ6tuHFvBX3WFGA8Cl0VWW2fy7PuQy5Jv9qy3rhoH2ywAz5fOC3gUm3m4CG9KR4ECLov55tDi0LhAeTSs1l1CVVCX2g8YQKGKWV9hVGuMIl3rzRM3//Z") center 42%/cover no-repeat;
   display:grid;grid-template-rows:1fr auto;
   transform-origin:center top;
   transition:opacity .7s cubic-bezier(.22,1,.36,1),
@@ -263,15 +261,33 @@ p{margin:0}
 .boot.done .boot-in{opacity:0;transform:translateY(-10px) scale(.985);
   transition:opacity .45s ease,transform .6s cubic-bezier(.76,0,.24,1)}
 .boot.done .boot-foot{opacity:0;transition:opacity .3s ease}
-.boot-in{align-self:center;justify-self:center;display:grid;justify-items:center;
-  gap:22px;padding:0 24px;text-align:center;
+.boot-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;
+  opacity:0;transform:scale(1.06);transition:opacity 1.1s ease;
+  animation:bootdrift 9s ease-out forwards}
+.boot-bg.in{opacity:1}
+@keyframes bootdrift{from{transform:scale(1.06)}to{transform:scale(1)}}
+/* keeps the type legible whatever the sky is doing: dark at the bottom and
+   the left, and the sun left alone */
+.boot-veil{position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, rgba(26,7,18,.55) 0%, rgba(26,7,18,.18) 38%, rgba(26,7,18,.62) 78%, #1A0712 100%),
+    radial-gradient(70% 60% at 50% 60%, rgba(26,7,18,.35) 0%, transparent 70%)}
+.boot-in{position:relative;align-self:center;justify-self:center;display:grid;justify-items:center;
+  gap:18px;padding:0 24px;text-align:center;
   transition:opacity .45s ease,transform .6s cubic-bezier(.76,0,.24,1)}
+.boot-salam{font-family:var(--ar);font-weight:500;font-size:clamp(38px,7vw,74px);line-height:1.2;
+  color:var(--gold);letter-spacing:0;margin-top:6px;
+  text-shadow:0 2px 24px rgba(26,7,18,.6);
+  animation:bootrise 1s cubic-bezier(.22,1,.36,1) .25s both}
+.boot-foot{position:relative}
 .boot-logo{width:clamp(150px,18vw,232px);height:auto;display:block;
   animation:bootrise .9s cubic-bezier(.22,1,.36,1) both}
 @keyframes bootrise{from{opacity:0;transform:translateY(14px) scale(.97)}
                     to{opacity:1;transform:none}}
 .boot-name{font-family:var(--disp);font-size:11px;letter-spacing:.34em;
-  text-transform:uppercase;color:rgba(var(--fg),.68)}
+  text-transform:uppercase;color:rgba(var(--fg),.78);
+  animation:bootrise 1s cubic-bezier(.22,1,.36,1) .45s both}
+html[dir="rtl"] .boot-name{letter-spacing:0;font-size:14px;font-family:var(--ar);text-transform:none}
 .boot-bar{width:min(220px,54vw);height:1px;background:rgba(var(--fg),.22);overflow:hidden}
 .boot-bar i{display:block;height:100%;width:100%;background:var(--gold);
   transform:scaleX(0);transform-origin:left center;
@@ -282,7 +298,7 @@ p{margin:0}
   padding:0 clamp(22px,6vw,60px) clamp(22px,4vh,40px);
   font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
   text-transform:uppercase;color:rgba(var(--fg),.4)}
-@media (prefers-reduced-motion:reduce){.boot-logo{animation:none}}
+@media (prefers-reduced-motion:reduce){.boot-logo,.boot-salam,.boot-name,.boot-bg{animation:none}}
 
 /* ---------- 1 · THE DESCENT — globe, dive, Silal, truck, one pin ---------- */
 .descent{position:relative;height:900vh;background:var(--night)}
@@ -913,7 +929,7 @@ a{color:inherit}
    record ran 1,613px with no image at all. This is his vehicle, his bay, his
    signboard — the section is about three decades of the same route, and this
    is what that looks like. */
-/* ---- Record: the supply map. One hub, eleven governorates. ---- */
+/* ---- Record: the supply map. One unit, eleven governorates. ---- */
 .omap{margin:clamp(30px,4vw,52px) 0 clamp(26px,3.5vw,44px);display:grid;gap:clamp(22px,4vw,48px);
   grid-template-columns:1fr;align-items:center;border:1px solid var(--line-soft);
   background:rgba(var(--fg),.035);padding:clamp(18px,3vw,36px);border-radius:3px}
@@ -922,17 +938,27 @@ a{color:inherit}
 /* anchors stay geometric in RTL: the labels sit beside their dots either way */
 .om-svg{display:block;width:100%;height:auto;overflow:visible;direction:ltr;
   font-family:"IBM Plex Mono",monospace}
-.om-land{fill:rgba(var(--fg),.05);stroke:rgba(var(--fg),.40);stroke-width:.3;stroke-linejoin:round}
-.om-r{fill:none;stroke:var(--gold);stroke-width:.34;stroke-linecap:round;opacity:.9;
+.om-gov{cursor:pointer;outline:none}
+.om-shape{fill:rgba(var(--fg),.045);stroke:rgba(var(--fg),.30);stroke-width:.26;stroke-linejoin:round;
+  transition:fill .35s ease,stroke .35s ease}
+.om-gov:hover .om-shape,.om-gov.is-on .om-shape,.om-gov:focus-visible .om-shape{
+  fill:rgba(var(--goldc),.22);stroke:var(--gold)}
+.om-r{fill:none;stroke:var(--gold);stroke-width:.34;stroke-linecap:round;opacity:.8;
   stroke-dasharray:1;stroke-dashoffset:1;
-  transition:stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*90ms)}
+  transition:stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1),opacity .35s;transition-delay:calc(var(--i)*90ms),0s}
 .omap.on .om-r{stroke-dashoffset:0}
+.om-gov:hover .om-r,.om-gov.is-on .om-r{opacity:1;stroke-width:.5}
 .om-d{fill:var(--gold);opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center;
   transition:opacity .35s,transform .55s cubic-bezier(.3,1.5,.5,1);transition-delay:calc(var(--i)*90ms + 850ms)}
 .omap.on .om-d{opacity:1;transform:scale(1)}
-.om-t{fill:rgba(var(--fg),.84);font-size:2.6px;letter-spacing:.03em;opacity:0;
-  transition:opacity .5s;transition-delay:calc(var(--i)*90ms + 950ms)}
+.omap.on .om-gov:hover .om-d,.omap.on .om-gov.is-on .om-d{transform:scale(1.6);transition-delay:0s}
+.om-t{fill:rgba(var(--fg),.84);font-size:2.6px;letter-spacing:.03em;opacity:0;pointer-events:none;
+  transition:opacity .5s,fill .3s;transition-delay:calc(var(--i)*90ms + 950ms),0s}
 .omap.on .om-t{opacity:1}
+.om-gov:hover .om-t,.om-gov.is-on .om-t{fill:var(--gold);font-weight:600}
+/* the deliveries themselves: a bright point running each route, longer roads take longer */
+.om-p{fill:var(--paper);opacity:0;transition:opacity .6s;transition-delay:1.6s}
+.omap.on .om-p{opacity:.95}
 .om-hub-core{fill:var(--pink)}
 .om-hub-ring{fill:none;stroke:var(--pink);stroke-width:.3;transform-box:fill-box;transform-origin:center;
   animation:omPulse 2.6s ease-out infinite}
@@ -944,7 +970,15 @@ html[dir="rtl"] .om-t{letter-spacing:0;font-size:3px}
 html[dir="rtl"] .om-k{letter-spacing:0}
 .om-k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
 .om-lead{margin:12px 0 0;font-size:clamp(18px,2.1vw,23px);line-height:1.35;color:rgba(var(--fg),.9);max-width:30ch}
-.om-legend{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:9px}
+.om-card{margin:20px 0 0;padding:14px 16px 15px;display:grid;gap:4px;border-radius:2px;
+  border:1px solid rgba(var(--goldc),.28);border-inline-start:3px solid var(--gold);background:rgba(var(--fg),.04)}
+.om-card-k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.om-card-v{font-family:var(--disp);font-weight:600;font-size:clamp(22px,2.6vw,30px);line-height:1.1;text-transform:uppercase;color:var(--paper)}
+.om-card-m{font-size:13px;color:rgba(var(--fg),.62)}
+html[dir="rtl"] .om-card-k{letter-spacing:0}
+html[dir="rtl"] .om-card-v{font-family:var(--ar);text-transform:none;font-weight:500}
+.om-hint{margin:10px 0 0;font-size:12px;color:rgba(var(--fg),.45)}
+.om-legend{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:9px}
 .om-legend li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:rgba(var(--fg),.64);line-height:1.4}
 .om-lg{width:10px;height:10px;border-radius:50%;flex:none}
 .om-lg-hub{background:var(--pink);box-shadow:0 0 0 3px rgba(var(--pinkc),.22)}
@@ -953,6 +987,7 @@ html[dir="rtl"] .om-k{letter-spacing:0}
   .om-r{stroke-dashoffset:0;transition:none}
   .om-d,.om-t{opacity:1;transform:none;transition:none}
   .om-hub-ring{animation:none;opacity:.6}
+  .om-p{display:none}
 }
 /* ---- Contact: click-to-load map ---- */
 .mapbox{margin:14px 0 0;position:relative;overflow:hidden;border:1px solid var(--line-soft);border-radius:3px;
@@ -1162,7 +1197,7 @@ html[dir="rtl"] .fu-go{direction:rtl}
   transform:scale(1.06)}
 .dw.on{opacity:1;transform:scale(1)}
 /* three different shots want three different centres */
-.dw:nth-child(1){object-position:center 62%}
+.dw:nth-child(1){object-position:center 44%}
 .dw:nth-child(2){object-position:center 48%}
 .dw:nth-child(3){object-position:center 58%}
 .dawn-veil{position:absolute;inset:0;pointer-events:none;
@@ -1774,9 +1809,17 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 <!-- Boot screen. Holds the page until fonts and the hero's first frames are
      ready, so nobody ever sees the site assemble itself. -->
 <div class="boot" id="boot">
+  <!-- First light over the Hajar, generated (14 Sep) so it repeats nothing
+       the film shows. A 500-byte blurred copy is painted inline and the real
+       image fades over it, so the curtain is never blank. -->
+  <img class="boot-bg" src="assets/img/boot-dawn.jpg" srcset="assets/img/boot-dawn-m.jpg 800w, assets/img/boot-dawn.jpg 1344w"
+       sizes="100vw" width="1344" height="540" alt="" aria-hidden="true" fetchpriority="high" decoding="async"
+       onload="this.classList.add('in')">
+  <div class="boot-veil" aria-hidden="true"></div>
   <div class="boot-in">
     <img class="boot-logo" src="assets/logo-color.svg" width="982" height="590" alt="Golden Rain Establishment">
-    <div class="boot-name">Golden Rain Establishment</div>
+    <div class="boot-salam" lang="ar" dir="rtl">السلام عليكم</div>
+    <div class="boot-name">Welcome to Golden Rain</div>
     <div class="boot-bar"><i id="bootFill"></i></div>
     <div class="boot-pct" id="bootPct">0%</div>
   </div>
@@ -1924,7 +1967,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <!-- Promoted from a footnote to the point of the section. It was set as
            a small mono aside under the list, which is where a reader's eye
            goes last; the client wanted it made the thing you actually read. -->
-      <p class="pullout rv">Everything is under one roof at Silal &mdash; the importers, the wholesalers, customs and the laboratories. That is how a whole day comes off the clock.</p>
+      <p class="pullout rv">Everything is under one roof at Silal: the importers, the wholesalers, customs and the laboratories. That is how a whole day comes off the clock.</p>
       <p class="pullout rv">Your trusted distributor of fresh fruits and vegetables across Oman.</p>
     </div>
     <figure class="rv">
@@ -2044,7 +2087,8 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
           <h3>Backed into the bay</h3>
           <p>Loaded and gone before the heat. Bay CSE&nbsp;30, every morning.</p>
         </div>
-        <figure><video data-scrub-in-view src="assets/video/play-3614.mp4" data-poster="assets/video/posters/play-3614.jpg" muted playsinline loop preload="none"></video></figure>
+        <figure><video data-scrub-in-view src="assets/video/play-bay.mp4" data-poster="assets/video/posters/play-bay.jpg" muted playsinline loop preload="none"
+                 aria-label="A loaded truck at the bay, doors open, a worker checking the last row"></video></figure>
       </li>
 
       <li class="rv">
@@ -2088,7 +2132,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 
 
       
-        <p class="sub rv">The grade and the grower are printed on the box. Nothing here was set up for a photograph &mdash; it is what was on the floor that morning.</p>
+        <p class="sub rv">The grade and the grower are printed on the box. Nothing here was set up for a photograph. It is what was on the floor that morning.</p>
       </div>
       <figure class="span rv" aria-label="Twenty-four origins">
         <div class="span-v">24<i>origins</i></div>
@@ -2129,7 +2173,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <p class="dawn-p" id="dawnP">The yard fills while the country sleeps.</p>
     </div>
     <ol class="dawn-steps" aria-hidden="true">
-      <li class="on"><b>Night</b><span>Parked at the bay, engine cold</span></li>
+      <li class="on"><b>Night</b><span>The fleet in, before anyone arrives</span></li>
       <li><b>Loading</b><span>Pallet by pallet, stacked to the roof</span></li>
       <li><b>Sunrise</b><span>Doors shut, already moving</span></li>
     </ol>
@@ -2142,29 +2186,90 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="kicker rv" data-n="06">The record</div>
     <h2 class="lead rv">Nearly three decades<br>on the roads of Oman.</h2>
     <!-- The loading-bay film was replaced at the client's request (14 Sep)
-         with a map of where the trucks actually go: one hub at Silal, every
-         governorate. The outline is OpenStreetMap-derived (geoBoundaries,
-         ODbL) drawn as inline SVG, so it weighs 7 KB, needs no third party,
-         and reads in both themes and both languages. Routes draw in once
-         when the figure scrolls into view. -->
+         with a map of where the trucks actually go: one unit at Silal, every
+         governorate. The eleven governorates are Natural Earth 10m admin-1
+         (public domain) as inline SVG, 20 KB, no third party, both themes and
+         both languages. Routes draw in once when the figure scrolls into
+         view; delivery pulses then run along them; hovering or tapping a
+         governorate names it in the card. A quiet tour steps through them
+         until the reader touches the map. -->
     <figure class="omap rv" id="omap" aria-label="Map of Oman showing deliveries from Silal, Barka to every governorate">
       <div class="om-map">
-<svg class="om-svg" viewBox="0 0 108 142" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="omTitle">
-  <title id="omTitle">Map of Oman: one hub at Barka, deliveries to every governorate</title>
-  <path class="om-land" d="M53.1,126.1L52.8,126.5L53.5,126.5ZM55.7,125.5L54.5,126.2L55.2,126.5L56.1,126.3L56.2,126.1L55.8,126.0ZM88.3,82.8L87.9,83.2ZM91.9,82.3L91.7,82.4L91.6,83.5L91.3,83.6L90.6,84.7L90.4,85.8L90.0,86.1L89.6,85.9L88.6,87.1L88.6,89.6L90.5,88.1L90.7,86.9L91.3,85.8L92.8,84.8L92.5,84.5L92.5,84.0L92.1,83.7L92.2,82.4ZM55.6,23.5L54.5,23.0L53.9,23.5L53.1,23.5L52.6,24.3L52.9,27.6L52.4,28.1L52.7,28.4L52.1,29.0L52.0,29.5L52.9,31.2L52.9,32.3L52.0,33.2L51.9,33.6L52.9,34.1L54.4,33.8L54.5,34.5L55.2,35.9L53.8,36.2L52.9,36.6L52.2,36.1L51.6,36.0L48.5,37.6L49.1,38.9L49.1,40.2L49.5,40.7L49.6,42.0L48.0,44.3L47.8,45.1L47.6,45.3L47.4,45.2L45.2,49.1L45.0,54.6L50.8,64.3L42.3,91.9L4.0,105.6L14.0,128.3L13.5,129.1L14.4,129.2L18.1,138.0L21.1,136.8L23.0,136.4L24.2,136.6L24.7,136.4L25.4,136.1L25.5,135.7L26.4,134.9L29.1,134.4L29.9,133.8L29.5,134.0L29.8,133.8L29.4,133.9L29.5,133.7L30.1,133.3L33.7,132.7L37.5,132.8L38.2,133.0L38.4,133.6L39.5,133.8L39.7,134.0L40.1,133.7L41.1,133.6L41.2,133.3L41.4,133.5L41.8,133.3L42.2,132.9L42.5,132.9L42.5,133.1L43.3,132.5L44.1,131.4L44.8,131.2L44.9,130.5L45.6,129.9L45.4,129.3L46.2,127.7L45.7,127.0L45.3,126.8L45.2,125.8L45.7,124.8L47.1,123.8L47.1,123.1L47.6,122.7L47.7,121.9L50.3,120.9L52.0,120.7L53.6,120.8L54.7,120.3L56.4,120.5L57.3,120.2L59.5,120.5L59.6,119.9L60.5,119.2L60.6,118.7L62.1,117.6L62.0,116.9L62.7,115.3L62.8,113.9L63.1,113.2L63.0,112.1L63.4,111.2L63.0,111.9L63.1,111.5L65.1,109.2L68.2,107.6L71.0,106.8L73.0,106.5L76.8,106.4L78.4,105.7L78.5,105.6L77.9,104.6L78.0,103.5L77.6,103.2L77.3,102.4L77.5,100.0L76.7,98.4L77.1,96.1L76.9,96.6L76.8,96.3L76.8,96.5L76.5,96.2L77.0,96.1L76.5,96.2L76.4,95.9L77.2,94.6L78.1,92.1L78.4,90.1L78.2,89.7L78.3,89.1L78.9,88.2L80.0,87.5L80.2,87.1L79.8,86.9L79.9,86.3L81.4,85.5L81.5,84.3L81.9,83.6L82.8,83.3L82.9,83.5L83.4,83.2L83.5,83.5L84.1,83.9L84.0,84.4L84.5,84.3L84.3,84.5L83.9,84.4L83.8,85.1L83.6,85.1L83.7,84.8L83.4,85.8L83.6,86.0L83.3,86.1L83.3,85.5L83.1,85.9L83.2,86.4L86.1,87.0L87.2,86.1L87.8,84.0L87.5,83.4L87.8,82.9L88.2,82.5L88.1,82.8L88.4,82.6L88.4,82.3L89.0,82.2L88.6,81.9L88.7,81.3L89.3,81.7L90.0,81.5L90.0,81.0L89.9,81.5L89.0,81.6L88.9,81.0L90.0,80.2L90.2,79.6L90.8,79.0L90.7,78.3L91.4,77.3L93.6,74.8L95.7,73.1L97.7,72.2L97.7,71.6L99.2,69.3L99.6,67.7L101.6,65.1L101.9,63.4L103.6,61.2L103.7,59.1L104.0,58.5L103.5,57.0L103.0,57.0L103.2,57.2L102.7,57.0L102.6,57.1L103.1,57.6L102.8,57.7L102.4,57.5L102.6,57.0L100.2,56.6L99.6,56.1L99.5,56.3L98.2,55.0L97.6,54.0L97.0,53.8L95.9,51.3L94.2,50.0L94.0,49.4L93.3,48.6L93.1,47.7L92.4,47.0L92.2,47.1L92.4,46.9L92.3,46.2L90.6,44.8L90.2,43.4L89.8,43.4L89.9,43.6L89.7,43.3L89.5,43.5L89.5,43.2L89.0,42.9L88.8,43.1L87.7,41.8L86.8,41.7L86.1,42.2L84.7,42.2L83.9,41.9L82.9,41.1L81.7,40.7L79.0,40.8L78.1,40.3L77.9,39.8L77.3,40.0L76.1,39.9L69.8,37.6L66.9,35.1L64.5,31.6L63.1,30.2L63.1,29.8L63.0,30.0L62.8,29.7L63.0,29.8L63.0,29.5L62.5,29.8L62.7,29.6L61.1,27.0L61.1,26.5L59.8,23.3L59.1,23.5L59.5,24.0L59.2,24.4L57.6,25.1L57.6,26.0L56.5,26.7L55.7,26.5L55.5,25.7L54.7,24.8L54.8,24.5L55.8,24.9L55.6,24.6L55.8,23.8L55.6,23.8ZM58.6,18.7L58.3,18.5L58.1,18.7L58.2,19.1L57.7,19.7L58.5,20.0L59.4,19.4L59.5,18.9L59.0,19.0L58.9,18.7ZM59.9,4.0L59.7,5.0L59.1,5.2L59.8,5.8L59.4,5.8L59.1,5.4L58.9,6.5L59.3,6.5L59.7,6.1L59.8,6.3L60.0,6.0L60.3,6.5L59.6,6.4L59.4,6.8L59.0,6.8L58.8,6.4L58.6,6.6L58.7,6.3L58.3,6.6L58.0,6.4L57.9,6.6L57.8,5.8L57.4,6.2L57.2,7.1L56.9,7.3L56.1,8.5L56.6,8.6L57.0,8.4L57.5,9.6L57.1,10.0L57.3,10.8L56.8,11.6L57.2,12.5L56.8,13.1L56.9,13.9L57.4,14.1L57.6,14.7L58.4,14.7L58.3,14.6L58.6,13.7L58.5,13.3L59.1,12.5L58.9,13.0L59.3,12.7L59.4,12.0L59.5,12.2L59.7,12.0L59.6,11.5L59.9,11.5L59.7,11.3L60.1,11.2L60.2,10.8L60.1,10.2L60.7,10.4L60.9,10.1L60.5,10.2L60.5,9.8L60.1,9.7L60.5,9.5L60.5,9.0L60.0,9.1L59.9,8.8L60.6,8.7L60.6,8.3L61.1,8.2L60.3,8.2L60.1,7.8L59.8,8.1L59.8,7.5L59.3,8.0L59.5,7.3L59.3,7.5L59.2,7.1L59.9,6.5L60.1,6.8L59.8,6.9L59.8,7.2L60.3,6.7L60.4,7.5L61.2,7.5L61.0,7.1L60.6,7.1L60.6,6.7L60.9,6.3L61.0,6.6L61.2,6.7L61.1,6.3L61.3,6.1L60.9,5.9L60.7,6.2L60.4,6.1L60.4,5.9L60.1,5.8L60.3,5.6L60.1,5.4L60.5,5.4L60.4,5.1L61.7,5.0L61.5,4.9L61.5,4.4L61.1,4.5L61.4,4.9L60.9,4.9L60.9,4.7L60.6,4.8L60.6,4.5L60.3,4.7L60.3,4.2L60.1,4.5L60.0,4.1L59.8,4.3Z"/>
-  <g class="om-routes"><path class="om-r" style="--i:0" pathLength="1" d="M78.0,42.6Q75.4,43.5 73.2,45.2"/><path class="om-r" style="--i:1" pathLength="1" d="M78.0,42.6Q81.7,43.2 85.4,42.5"/><path class="om-r" style="--i:2" pathLength="1" d="M78.0,42.6Q75.5,46.8 74.6,51.5"/><path class="om-r" style="--i:3" pathLength="1" d="M78.0,42.6Q81.6,49.6 87.3,54.9"/><path class="om-r" style="--i:4" pathLength="1" d="M78.0,42.6Q69.4,43.6 61.6,47.5"/><path class="om-r" style="--i:5" pathLength="1" d="M78.0,42.6Q72.1,36.1 64.3,32.1"/><path class="om-r" style="--i:6" pathLength="1" d="M78.0,42.6Q87.8,51.6 100.0,56.5"/><path class="om-r" style="--i:7" pathLength="1" d="M78.0,42.6Q66.0,35.7 52.4,33.4"/><path class="om-r" style="--i:8" pathLength="1" d="M78.0,42.6Q70.9,23.2 58.2,6.8"/><path class="om-r" style="--i:9" pathLength="1" d="M78.0,42.6Q65.3,66.4 58.5,92.4"/><path class="om-r" style="--i:10" pathLength="1" d="M78.0,42.6Q51.5,86.3 30.7,132.9"/></g>
-  <g class="om-dots"><circle class="om-d" style="--i:0" cx="73.2" cy="45.2" r="1.1"/><circle class="om-d" style="--i:1" cx="85.4" cy="42.5" r="1.1"/><circle class="om-d" style="--i:2" cx="74.6" cy="51.5" r="1.1"/><circle class="om-d" style="--i:3" cx="87.3" cy="54.9" r="1.1"/><circle class="om-d" style="--i:4" cx="61.6" cy="47.5" r="1.1"/><circle class="om-d" style="--i:5" cx="64.3" cy="32.1" r="1.1"/><circle class="om-d" style="--i:6" cx="100.0" cy="56.5" r="1.1"/><circle class="om-d" style="--i:7" cx="52.4" cy="33.4" r="1.1"/><circle class="om-d" style="--i:8" cx="58.2" cy="6.8" r="1.1"/><circle class="om-d" style="--i:9" cx="58.5" cy="92.4" r="1.1"/><circle class="om-d" style="--i:10" cx="30.7" cy="132.9" r="1.1"/></g>
-  <g class="om-labels"><text class="om-t" style="--i:0" x="71.0" y="46.1" text-anchor="end">Rustaq</text><text class="om-t" style="--i:1" x="87.6" y="43.4" text-anchor="start">Muscat</text><text class="om-t" style="--i:2" x="72.4" y="52.4" text-anchor="end">Nizwa</text><text class="om-t" style="--i:3" x="89.5" y="55.8" text-anchor="start">Ibra</text><text class="om-t" style="--i:4" x="59.4" y="48.4" text-anchor="end">Ibri</text><text class="om-t" style="--i:5" x="64.3" y="29.8" text-anchor="middle">Sohar</text><text class="om-t" style="--i:6" x="102.2" y="57.4" text-anchor="start">Sur</text><text class="om-t" style="--i:7" x="50.2" y="34.3" text-anchor="end">Al Buraimi</text><text class="om-t" style="--i:8" x="60.4" y="7.7" text-anchor="start">Khasab</text><text class="om-t" style="--i:9" x="56.3" y="93.3" text-anchor="end">Haima</text><text class="om-t" style="--i:10" x="32.9" y="133.8" text-anchor="start">Salalah</text></g>
-  <g class="om-hub" transform="translate(78.0,42.6)">
+<svg class="om-svg" viewBox="0 0 108 142" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="group" aria-labelledby="omTitle">
+  <title id="omTitle">Map of Oman: one unit at Silal, Barka, deliveries to every governorate</title>
+  <g class="om-gov" data-i="0" data-en="Al Batinah South" data-ar="محافظة جنوب الباطنة" data-cap="Rustaq" data-cap-ar="الرستاق" tabindex="0" role="button" aria-label="Al Batinah South Governorate, deliveries to Rustaq">
+    <path class="om-shape" d="M74.6,39.1L75.3,39.4L76.0,39.6L76.6,39.7L76.9,39.7L77.7,39.6L78.0,39.7L78.3,40.2L78.5,40.3L78.8,40.4L79.1,40.5L79.4,40.6L81.1,40.5L81.7,40.5L82.2,40.6L82.1,40.7L82.1,40.8L82.1,40.8L81.7,42.7L82.1,44.1L79.3,46.4L78.9,47.2L75.6,47.7L75.2,47.5L73.7,47.3L69.9,43.5L71.5,43.0L73.1,41.6L74.6,39.1Z"/>
+    <path class="om-r" id="om-r-0" style="--i:0" pathLength="1" d="M78.0,42.5Q75.4,43.3 73.2,45.1"/>
+    <circle class="om-d" style="--i:0" cx="73.2" cy="45.1" r="1.1"/>
+    <text class="om-t" style="--i:0" x="73.2" y="49.0" text-anchor="middle">Rustaq</text>
+  </g><g class="om-gov" data-i="1" data-en="Muscat" data-ar="محافظة مسقط" data-cap="Muscat" data-cap-ar="مسقط" tabindex="0" role="button" aria-label="Muscat Governorate, deliveries to Muscat">
+    <path class="om-shape" d="M82.2,40.6L83.0,41.0L83.2,41.0L83.4,41.1L83.9,41.6L84.1,41.8L84.6,41.9L85.2,42.0L85.8,42.0L86.3,41.9L86.6,41.8L86.7,41.7L86.8,41.4L86.9,41.4L87.1,41.5L87.7,41.5L88.0,41.6L88.2,41.7L88.3,41.9L88.6,42.4L88.7,42.5L88.8,42.5L88.8,42.6L88.9,42.7L88.9,42.7L89.0,42.7L89.0,42.7L89.1,42.7L89.2,42.7L89.4,42.9L89.5,43.0L89.5,43.1L89.6,43.1L89.7,42.9L89.7,43.0L89.8,43.0L89.8,43.1L89.8,43.2L89.9,43.2L89.9,43.1L90.0,43.0L90.0,43.1L90.1,43.1L90.2,43.0L90.5,43.4L90.6,43.6L90.6,43.8L90.7,44.0L90.8,44.7L91.0,44.9L91.7,45.6L92.2,45.8L92.4,46.1L92.6,46.7L92.7,46.9L93.1,47.2L93.3,47.5L93.4,48.3L94.2,49.1L94.3,49.3L94.3,49.7L94.4,49.8L94.4,49.8L94.8,50.1L95.5,50.5L95.9,50.8L96.2,51.2L96.4,51.6L96.6,51.9L96.6,51.9L96.3,52.3L95.4,53.3L91.2,52.7L87.4,50.1L88.0,47.0L84.8,43.7L82.1,44.1L82.1,44.1L81.7,42.7L82.1,40.8L82.1,40.8L82.1,40.7L82.2,40.6Z"/>
+    <path class="om-r" id="om-r-1" style="--i:1" pathLength="1" d="M78.0,42.5Q81.7,43.1 85.4,42.4"/>
+    <circle class="om-d" style="--i:1" cx="85.4" cy="42.4" r="1.1"/>
+    <text class="om-t" style="--i:1" x="88.0" y="43.3" text-anchor="start">Muscat</text>
+  </g><g class="om-gov" data-i="2" data-en="Ad Dakhiliyah" data-ar="محافظة الداخلية" data-cap="Nizwa" data-cap-ar="نزوى" tabindex="0" role="button" aria-label="Ad Dakhiliyah Governorate, deliveries to Nizwa">
+    <path class="om-shape" d="M81.6,68.1L82.8,72.4L84.2,76.5L80.2,74.4L59.3,63.9L61.8,60.7L63.8,54.6L66.2,43.7L69.9,43.5L73.7,47.3L75.2,47.5L75.6,47.7L78.9,47.2L79.3,46.4L82.1,44.1L82.1,44.1L84.8,43.7L88.0,47.0L87.4,50.1L85.5,50.6L83.4,52.0L82.6,52.1L79.7,54.3L78.4,57.0L81.6,68.1Z"/>
+    <path class="om-r" id="om-r-2" style="--i:2" pathLength="1" d="M78.0,42.5Q75.5,46.6 74.6,51.3"/>
+    <circle class="om-d" style="--i:2" cx="74.6" cy="51.3" r="1.1"/>
+    <text class="om-t" style="--i:2" x="72.0" y="52.2" text-anchor="end">Nizwa</text>
+  </g><g class="om-gov" data-i="3" data-en="Ash Sharqiyah North" data-ar="محافظة شمال الشرقية" data-cap="Ibra" data-cap-ar="إبراء" tabindex="0" role="button" aria-label="Ash Sharqiyah North Governorate, deliveries to Ibra">
+    <path class="om-shape" d="M96.6,51.9L96.9,52.8L96.9,53.0L97.0,53.3L97.3,53.5L97.7,53.7L98.2,54.5L98.3,54.7L98.5,54.9L99.0,55.4L99.4,55.7L98.7,56.4L98.7,57.1L99.0,57.8L98.9,59.6L98.2,61.3L96.7,62.1L93.9,63.6L91.1,64.6L88.1,65.7L84.9,66.9L81.6,68.1L78.4,57.0L79.7,54.3L82.6,52.1L83.4,52.0L85.5,50.6L87.4,50.1L91.2,52.7L95.4,53.3L96.3,52.3L96.6,51.9L96.6,51.9Z"/>
+    <path class="om-r" id="om-r-3" style="--i:3" pathLength="1" d="M78.0,42.5Q81.6,49.4 87.3,54.7"/>
+    <circle class="om-d" style="--i:3" cx="87.3" cy="54.7" r="1.1"/>
+    <text class="om-t" style="--i:3" x="89.9" y="55.6" text-anchor="start">Ibra</text>
+  </g><g class="om-gov" data-i="4" data-en="Adh Dhahirah" data-ar="محافظة الظاهرة" data-cap="Ibri" data-cap-ar="عبري" tabindex="0" role="button" aria-label="Adh Dhahirah Governorate, deliveries to Ibri">
+    <path class="om-shape" d="M44.8,54.5L44.9,52.5L44.8,50.5L44.8,50.5L44.9,50.1L45.3,48.8L46.5,46.7L46.8,45.8L47.0,44.4L47.2,44.0L47.4,43.6L47.4,43.6L47.9,43.1L48.1,42.9L49.8,43.0L51.1,42.3L52.8,41.8L53.7,41.2L53.3,39.2L53.8,38.5L54.6,38.2L54.6,37.0L55.3,36.5L57.2,36.2L58.7,36.2L59.1,34.8L61.1,35.7L64.8,39.0L66.0,43.4L66.2,43.7L63.8,54.6L61.8,60.7L59.3,63.9L50.3,65.9L50.0,66.0L50.5,64.4L50.5,64.1L50.4,63.8L49.7,62.7L48.7,61.0L47.6,59.3L46.6,57.5L45.6,55.8L44.8,54.5Z"/>
+    <path class="om-r" id="om-r-4" style="--i:4" pathLength="1" d="M78.0,42.5Q69.4,43.4 61.7,47.3"/>
+    <circle class="om-d" style="--i:4" cx="61.7" cy="47.3" r="1.1"/>
+    <text class="om-t" style="--i:4" x="59.1" y="48.2" text-anchor="end">Ibri</text>
+  </g><g class="om-gov" data-i="5" data-en="Al Batinah North" data-ar="محافظة شمال الباطنة" data-cap="Sohar" data-cap-ar="صحار" tabindex="0" role="button" aria-label="Al Batinah North Governorate, deliveries to Sohar">
+    <path class="om-shape" d="M56.1,26.7L56.4,26.7L56.6,26.6L56.7,26.5L56.8,26.3L57.1,25.9L57.3,25.4L57.3,25.4L57.5,25.3L58.0,25.3L58.2,25.2L58.6,24.8L58.7,24.7L59.0,24.4L59.1,24.3L59.1,24.2L59.1,24.0L59.2,23.5L59.2,23.4L59.3,23.4L60.0,23.3L60.3,24.4L61.1,26.1L61.2,26.2L61.3,26.5L61.4,27.1L62.9,29.9L63.2,30.3L63.9,30.9L65.3,32.6L65.6,33.0L65.7,33.3L65.8,33.6L67.1,35.1L68.6,36.4L69.8,37.4L70.2,37.6L72.0,38.3L74.3,38.9L74.6,39.1L73.1,41.6L71.5,43.0L69.9,43.5L66.2,43.7L66.0,43.4L64.8,39.0L61.1,35.7L59.1,34.8L59.0,33.6L57.8,29.4L56.1,27.3L56.1,26.7L56.1,26.7Z"/>
+    <path class="om-r" id="om-r-5" style="--i:5" pathLength="1" d="M78.0,42.5Q72.2,36.0 64.4,32.0"/>
+    <circle class="om-d" style="--i:5" cx="64.4" cy="32.0" r="1.1"/>
+    <text class="om-t" style="--i:5" x="64.4" y="29.6" text-anchor="middle">Sohar</text>
+  </g><g class="om-gov" data-i="6" data-en="Ash Sharqiyah South" data-ar="محافظة جنوب الشرقية" data-cap="Sur" data-cap-ar="صور" tabindex="0" role="button" aria-label="Ash Sharqiyah South Governorate, deliveries to Sur">
+    <path class="om-shape" d="M99.4,55.7L99.7,55.9L100.0,56.1L100.1,56.1L100.1,56.3L100.0,56.3L99.9,56.3L99.8,56.2L99.8,56.4L99.9,56.5L100.1,56.5L100.3,56.5L101.2,56.2L101.6,56.3L102.1,56.7L102.2,56.7L102.4,56.7L102.4,56.7L102.5,56.8L102.5,56.9L102.5,57.0L102.5,57.0L102.5,57.1L102.5,57.2L102.6,57.3L102.7,57.3L102.7,57.3L102.8,57.4L102.9,57.4L103.0,57.3L102.9,57.2L102.7,56.9L102.7,56.8L102.9,56.8L103.1,56.7L103.5,56.8L103.7,57.2L103.9,57.6L104.0,58.0L103.7,60.3L103.6,60.9L103.3,61.4L102.6,62.4L102.2,62.8L102.0,63.0L101.9,63.2L101.9,63.6L101.6,64.2L101.6,64.9L101.5,65.2L101.0,65.4L100.8,65.6L100.6,66.1L99.6,67.5L99.2,68.7L99.0,69.3L97.8,71.2L97.7,71.6L97.6,71.8L97.5,71.8L95.7,72.7L95.4,72.9L94.0,74.1L92.2,75.9L91.7,76.7L91.6,76.8L91.4,76.9L91.2,77.2L90.8,78.0L90.8,78.1L90.7,78.6L90.7,78.7L90.6,78.8L89.9,79.5L89.9,79.7L89.7,79.9L89.2,80.2L89.2,80.2L89.1,80.5L89.1,80.5L89.0,80.6L89.0,80.6L88.9,80.7L89.0,80.8L89.0,81.0L89.1,81.1L89.3,81.1L89.5,81.1L89.7,80.9L89.8,80.8L89.8,81.0L89.7,81.2L89.4,81.4L89.2,81.5L89.1,81.3L89.0,81.3L89.0,81.5L88.9,81.9L88.8,82.1L88.7,82.2L88.4,82.3L88.2,82.5L88.1,82.7L87.9,83.1L87.8,83.5L87.8,83.8L87.5,84.5L87.3,85.0L87.3,85.2L87.2,85.3L87.2,85.7L87.1,85.8L87.0,85.9L86.9,85.9L86.7,86.0L86.6,86.1L86.5,86.5L86.2,86.6L85.9,86.6L85.5,86.5L85.3,86.4L85.1,86.3L84.7,86.3L84.5,86.3L84.2,86.5L84.1,86.5L84.1,86.4L84.2,86.3L84.1,86.3L83.7,86.2L83.4,86.1L83.1,86.0L83.1,85.7L83.3,85.2L83.3,85.4L83.3,85.5L83.4,85.6L83.5,85.8L83.6,85.5L83.5,84.9L83.6,84.6L83.7,84.3L83.9,83.9L83.9,83.5L83.8,83.2L85.6,77.2L84.2,76.5L82.8,72.4L81.6,68.1L84.9,66.9L88.1,65.7L91.1,64.6L93.9,63.6L96.7,62.1L98.2,61.3L98.9,59.6L99.0,57.8L98.7,57.1L98.7,56.4L99.4,55.7ZM92.1,83.0L92.1,83.3L92.2,83.5L92.6,84.2L92.7,84.4L92.6,84.6L92.5,84.7L92.0,85.1L91.5,85.4L91.3,85.6L91.0,86.0L90.8,86.4L90.7,87.0L90.6,87.2L90.6,87.2L90.6,87.4L90.6,87.4L90.6,87.5L90.6,87.6L90.5,87.7L90.1,88.2L89.9,88.5L89.8,88.6L89.6,88.7L89.5,88.7L89.3,88.7L89.3,88.8L89.2,88.9L89.1,89.1L89.0,89.2L88.8,89.2L88.8,89.2L88.8,89.1L88.7,89.0L88.7,88.6L88.6,88.1L88.7,87.9L88.7,87.9L88.6,87.8L88.7,86.7L88.8,86.5L88.9,86.3L89.0,86.2L89.2,86.1L89.3,86.0L89.3,86.0L89.4,86.0L89.4,85.7L89.5,85.6L89.7,85.6L89.9,85.6L90.1,85.5L90.3,85.4L90.4,85.2L90.5,85.2L90.5,85.0L90.5,85.0L90.6,84.4L90.7,84.2L90.8,84.0L91.4,83.2L91.6,82.7L91.8,82.2L91.9,82.0L92.1,82.0L92.2,82.2L92.2,82.2L92.2,82.5L92.1,82.7L92.1,83.0Z"/>
+    <path class="om-r" id="om-r-6" style="--i:6" pathLength="1" d="M78.0,42.5Q87.8,51.4 100.0,56.4"/>
+    <circle class="om-d" style="--i:6" cx="100.0" cy="56.4" r="1.1"/>
+    <text class="om-t" style="--i:6" x="102.6" y="57.3" text-anchor="start">Sur</text>
+  </g><g class="om-gov" data-i="7" data-en="Al Buraimi" data-ar="محافظة البريمي" data-cap="Al Buraimi" data-cap-ar="البريمي" tabindex="0" role="button" aria-label="Al Buraimi Governorate, deliveries to Al Buraimi">
+    <path class="om-shape" d="M54.3,23.3L54.8,23.4L54.8,23.4L55.2,23.6L55.3,24.0L55.4,24.6L55.5,24.9L55.2,24.7L55.0,24.6L54.8,24.6L54.6,24.6L54.6,24.8L54.7,25.0L55.2,25.4L55.5,26.4L55.9,26.7L56.1,26.7L56.1,27.3L57.8,29.4L59.0,33.6L59.1,34.8L58.7,36.2L57.2,36.2L55.3,36.5L54.6,37.0L54.6,38.2L53.8,38.5L53.3,39.2L53.7,41.2L52.8,41.8L51.1,42.3L49.8,43.0L48.1,42.9L48.5,41.2L48.6,40.9L49.2,40.1L49.3,39.9L49.2,38.8L49.2,38.4L49.0,38.1L48.5,37.9L48.3,37.7L48.2,37.4L48.2,37.2L48.8,37.1L49.3,36.9L49.6,36.8L49.9,36.6L50.3,36.4L50.6,36.4L51.1,36.4L51.5,36.5L51.7,36.4L51.9,36.4L52.1,36.3L52.4,36.6L52.7,36.6L54.2,36.0L55.0,35.8L55.1,35.6L54.6,34.8L54.5,34.2L54.3,33.7L53.9,33.5L53.2,33.8L53.0,33.8L52.2,33.6L52.0,33.6L52.0,33.3L52.1,33.1L52.6,32.2L52.7,32.0L52.7,31.4L52.7,31.3L52.6,31.1L52.3,31.0L52.3,30.9L52.2,30.7L52.2,29.9L52.1,29.3L52.1,29.1L52.2,28.9L52.4,28.7L52.5,28.2L52.8,27.9L52.8,27.6L52.6,27.2L52.5,27.1L52.5,26.8L52.5,26.3L52.5,26.0L52.4,25.0L52.6,24.6L53.0,24.1L53.3,23.8L53.4,23.7L53.8,23.4L54.3,23.3Z"/>
+    <path class="om-r" id="om-r-7" style="--i:7" pathLength="1" d="M78.0,42.5Q66.1,35.6 52.5,33.3"/>
+    <circle class="om-d" style="--i:7" cx="52.5" cy="33.3" r="1.1"/>
+    <text class="om-t" style="--i:7" x="49.9" y="34.2" text-anchor="end">Al Buraimi</text>
+  </g><g class="om-gov" data-i="8" data-en="Musandam" data-ar="محافظة مسندم" data-cap="Khasab" data-cap-ar="خصب" tabindex="0" role="button" aria-label="Musandam Governorate, deliveries to Khasab">
+    <path class="om-shape" d="M59.6,19.0L59.5,19.3L59.1,19.5L58.9,19.6L58.7,19.8L58.3,20.0L58.1,20.1L57.9,20.1L57.8,20.0L57.8,19.9L57.7,19.8L57.8,19.5L58.1,19.3L58.2,19.2L58.2,19.1L58.1,18.9L58.1,18.7L58.4,18.5L58.8,18.5L59.1,18.9L59.6,19.0ZM57.1,14.0L57.0,14.0L57.0,13.8L56.9,13.2L56.9,13.0L57.1,12.8L57.2,12.7L57.3,12.5L57.3,12.3L57.0,12.0L56.9,11.7L57.0,11.5L57.2,11.2L57.3,11.0L57.3,9.8L57.4,9.3L57.5,9.1L57.4,8.8L57.2,8.3L57.0,8.3L56.4,8.4L56.1,8.5L56.1,8.5L56.2,8.3L56.3,7.8L57.1,6.5L57.4,5.9L57.6,5.8L57.8,5.7L57.8,5.8L57.8,5.9L57.9,6.2L57.9,6.2L57.8,6.4L57.9,6.4L58.0,6.3L58.4,6.3L58.4,6.2L58.5,6.2L58.7,6.2L58.8,6.4L58.9,6.6L59.0,6.5L59.1,6.5L59.2,6.5L59.3,6.5L59.7,6.3L59.8,6.3L60.2,6.4L60.3,6.3L60.3,6.2L60.2,6.1L60.1,6.0L60.0,6.0L59.8,5.9L59.6,6.0L59.5,6.0L59.5,6.1L59.3,6.2L59.2,6.3L59.0,6.3L59.0,6.1L59.1,5.5L59.1,5.3L59.5,5.6L59.7,5.7L59.7,5.5L59.7,5.4L59.5,5.2L59.4,5.1L59.2,5.0L59.3,4.9L59.3,4.9L59.4,4.9L59.5,4.9L59.7,4.7L59.7,4.5L59.7,4.2L59.7,4.0L59.8,4.0L60.0,4.4L60.2,4.2L60.3,4.2L60.4,4.3L60.3,4.4L60.3,4.4L60.3,4.5L60.4,4.6L60.5,4.5L60.6,4.5L60.6,4.6L60.7,4.7L61.0,4.7L61.2,4.8L61.3,4.7L61.3,4.7L61.2,4.5L61.2,4.5L61.5,4.4L61.6,4.7L61.6,4.9L61.4,4.9L61.1,4.9L60.9,4.9L60.5,5.3L60.3,5.4L60.3,5.4L60.3,5.5L60.2,5.6L60.5,5.9L60.6,6.0L60.8,6.1L60.9,6.0L61.0,5.9L61.2,5.9L61.3,6.1L61.1,6.5L61.0,6.5L60.9,6.3L60.8,6.3L60.6,6.3L60.7,6.4L60.7,6.5L60.7,6.5L60.6,6.6L60.8,6.8L61.0,6.9L61.1,7.0L61.2,7.3L61.1,7.3L60.9,7.3L60.8,7.2L60.7,7.1L60.5,7.2L60.4,7.1L60.3,7.0L60.3,6.7L60.2,6.8L60.0,6.9L59.9,6.9L59.9,6.8L59.9,6.7L60.0,6.6L60.1,6.5L59.8,6.5L59.5,6.7L59.3,6.9L59.4,7.1L59.3,7.2L59.3,7.4L59.3,7.6L59.4,7.8L59.5,7.5L59.6,7.3L59.7,7.3L59.8,7.4L59.8,7.5L59.8,7.7L59.7,7.9L60.0,8.0L61.1,7.9L61.0,8.1L60.8,8.3L60.4,8.5L60.1,8.6L60.0,8.8L60.0,9.0L60.3,8.8L60.5,9.0L60.5,9.2L60.2,9.4L60.3,9.6L60.4,9.8L60.5,9.9L60.6,9.9L60.9,10.0L60.8,10.1L60.8,10.1L60.7,10.3L60.5,10.2L60.3,10.2L60.1,10.2L60.0,10.3L60.2,10.6L60.1,10.9L59.9,11.2L59.7,11.5L59.7,11.6L59.7,11.9L59.5,12.2L59.3,12.6L59.1,12.7L59.0,12.8L59.0,12.5L58.8,12.8L58.6,13.3L58.5,13.8L58.6,14.2L58.7,14.4L58.1,14.5L57.9,14.6L57.7,14.5L57.7,14.4L57.5,14.2L57.4,14.1L57.1,14.0L57.1,14.0Z"/>
+    <path class="om-r" id="om-r-8" style="--i:8" pathLength="1" d="M78.0,42.5Q71.0,23.1 58.3,6.8"/>
+    <circle class="om-d" style="--i:8" cx="58.3" cy="6.8" r="1.1"/>
+    <text class="om-t" style="--i:8" x="60.9" y="7.7" text-anchor="start">Khasab</text>
+  </g><g class="om-gov" data-i="9" data-en="Al Wusta" data-ar="محافظة الوسطى" data-cap="Haima" data-cap-ar="هيماء" tabindex="0" role="button" aria-label="Al Wusta Governorate, deliveries to Haima">
+    <path class="om-shape" d="M46.8,76.5L47.0,76.0L47.6,73.8L48.3,71.8L48.8,69.9L49.3,68.4L49.7,67.2L49.9,66.5L50.0,66.2L50.0,66.0L50.3,65.9L59.3,63.9L80.2,74.4L84.2,76.5L85.6,77.2L83.8,83.2L83.5,83.1L83.2,83.2L82.8,83.3L82.4,83.5L81.9,83.7L81.7,83.8L81.6,83.9L81.4,84.6L81.4,84.7L81.5,84.9L81.5,85.0L81.4,85.1L81.3,85.2L80.9,85.2L80.7,85.3L80.5,85.5L80.2,85.8L80.1,85.9L80.0,86.1L80.0,86.3L80.0,86.4L80.2,86.6L80.2,86.7L80.1,87.0L79.9,87.2L79.3,87.4L79.1,87.6L78.9,87.8L78.7,88.0L78.6,88.2L78.6,88.4L78.4,88.6L78.3,88.8L78.3,89.1L78.5,89.7L78.6,90.0L78.4,90.5L78.2,91.3L78.2,91.5L78.2,91.9L77.9,92.6L77.7,93.4L77.5,93.7L76.7,94.9L76.6,95.3L76.7,95.7L76.7,95.9L76.9,96.0L76.9,96.1L77.0,96.3L77.0,96.7L77.0,96.9L76.9,97.1L76.8,97.5L76.8,97.7L76.9,98.0L77.5,99.0L77.6,99.3L77.7,99.7L77.7,100.0L77.6,100.4L77.4,101.0L77.4,101.3L77.4,101.6L77.6,102.3L77.8,102.5L78.1,102.9L78.2,103.1L78.0,103.7L78.0,104.0L78.5,104.9L78.5,105.1L78.2,105.4L78.0,105.5L78.0,105.6L77.4,105.6L77.3,105.7L77.3,105.8L77.1,105.9L77.0,106.0L76.9,106.0L74.2,105.9L73.5,106.0L62.5,103.0L47.0,76.8L46.8,76.5Z"/>
+    <path class="om-r" id="om-r-9" style="--i:9" pathLength="1" d="M78.0,42.5Q65.3,66.1 58.6,92.1"/>
+    <circle class="om-d" style="--i:9" cx="58.6" cy="92.1" r="1.1"/>
+    <text class="om-t" style="--i:9" x="56.0" y="93.0" text-anchor="end">Haima</text>
+  </g><g class="om-gov" data-i="10" data-en="Dhofar" data-ar="محافظة ظفار" data-cap="Salalah" data-cap-ar="صلالة" tabindex="0" role="button" aria-label="Dhofar Governorate, deliveries to Salalah">
+    <path class="om-shape" d="M4.1,105.6L4.0,105.3L5.4,104.8L7.6,104.0L9.8,103.3L11.9,102.5L14.1,101.7L16.3,100.9L18.5,100.1L20.6,99.3L22.8,98.6L25.0,97.8L27.2,97.0L29.3,96.2L31.5,95.4L33.7,94.7L35.9,93.9L38.0,93.1L40.2,92.3L42.1,91.6L42.5,90.3L42.6,90.0L42.9,89.3L43.2,88.1L43.7,86.5L44.3,84.7L44.9,82.7L45.6,80.5L46.3,78.2L46.8,76.5L47.0,76.8L62.5,103.0L73.5,106.0L70.5,106.5L68.9,107.0L66.8,107.9L65.9,108.5L65.4,108.8L65.1,109.0L65.0,109.3L64.9,109.4L63.5,110.8L63.3,111.3L63.2,112.0L63.3,112.4L63.3,112.6L63.3,112.7L63.1,113.0L63.0,113.2L62.9,113.5L62.9,113.6L62.9,114.2L62.8,114.8L62.1,116.4L62.3,116.6L62.3,116.9L62.1,117.2L61.8,117.4L61.3,117.7L61.0,117.8L60.6,118.5L60.5,118.6L60.4,118.7L60.3,118.7L59.7,119.4L59.6,119.5L59.7,119.8L59.5,119.8L57.5,119.6L57.3,119.6L56.9,119.8L56.6,119.9L55.5,119.8L55.3,119.8L54.4,120.1L54.0,120.3L50.7,120.4L49.4,120.8L49.2,120.8L49.1,120.8L49.0,120.9L48.9,120.9L48.9,121.0L48.6,121.0L48.6,121.0L48.2,121.1L48.1,121.2L47.9,121.4L47.7,121.9L47.6,122.2L47.4,122.4L47.4,122.5L47.2,123.1L47.1,123.1L46.9,123.3L45.8,124.4L45.4,125.0L45.3,125.3L45.3,125.6L45.3,126.0L45.5,126.2L45.9,126.4L46.1,126.7L46.2,127.0L46.2,127.6L46.2,127.9L45.6,128.6L45.6,128.7L45.6,128.9L45.6,129.1L45.7,129.2L45.8,129.2L45.8,129.3L45.7,129.5L45.6,129.6L45.3,129.7L45.2,129.8L45.1,129.9L45.1,130.0L45.0,130.3L44.9,130.5L44.9,130.6L44.8,130.7L44.4,130.8L44.2,130.9L44.2,131.1L44.1,131.3L44.0,131.4L43.8,131.5L43.3,132.1L42.8,132.5L42.7,132.5L42.5,132.3L42.4,132.4L42.2,132.6L42.1,132.7L41.9,132.8L41.7,132.8L41.5,132.9L41.4,132.8L41.2,133.0L40.9,133.1L40.4,133.2L40.0,133.4L39.8,133.4L39.6,133.2L39.5,133.3L39.2,133.2L39.1,133.3L38.7,133.0L38.6,133.1L38.5,132.8L38.4,132.6L38.3,132.4L37.7,132.3L37.4,132.2L37.2,132.2L37.1,132.2L36.8,132.2L36.7,132.3L36.2,132.2L36.0,132.2L35.9,132.2L35.6,132.3L35.6,132.4L35.0,132.2L34.7,132.2L34.4,132.4L34.3,132.3L34.2,132.3L31.8,132.5L30.8,132.5L30.6,132.6L30.0,132.9L29.9,133.0L29.8,133.1L29.8,133.2L29.8,133.3L29.9,133.4L29.8,133.6L29.6,133.7L29.6,133.8L29.5,133.9L29.1,134.0L28.6,134.0L27.8,134.2L27.5,134.2L27.3,134.3L27.1,134.5L26.8,134.6L26.6,134.5L26.3,134.7L26.0,134.9L25.7,135.3L25.6,135.5L25.5,135.7L25.3,135.8L24.8,136.0L24.4,136.1L22.4,136.2L21.3,136.3L19.2,137.0L18.1,137.6L17.3,135.7L16.5,133.9L15.7,132.0L15.0,130.2L14.5,129.0L14.3,128.8L14.1,128.8L13.6,128.7L13.4,128.6L13.5,128.6L13.5,128.6L13.6,128.6L13.2,127.6L12.6,126.3L12.1,125.0L11.5,123.6L11.0,122.3L10.4,121.0L9.9,119.7L9.3,118.3L8.8,117.0L8.3,115.7L7.7,114.4L7.2,113.0L6.6,111.7L6.1,110.4L5.5,109.1L5.0,107.7L4.4,106.4L4.1,105.6ZM53.0,126.0L53.0,125.8L53.0,125.8L53.0,125.8L53.1,125.7L53.2,125.6L53.4,125.6L53.6,125.7L53.7,125.8L53.7,125.8L53.5,125.9L53.2,125.9L53.0,126.0L53.0,126.0ZM55.8,125.0L55.8,125.0L55.9,125.2L55.9,125.2L56.0,125.4L56.2,125.5L56.3,125.6L55.9,125.8L55.7,125.9L55.5,126.0L55.0,125.9L54.8,125.9L54.7,125.6L55.0,125.4L55.5,125.2L55.8,125.0Z"/>
+    <path class="om-r" id="om-r-10" style="--i:10" pathLength="1" d="M78.0,42.5Q51.6,86.0 30.8,132.4"/>
+    <circle class="om-d" style="--i:10" cx="30.8" cy="132.4" r="1.1"/>
+    <text class="om-t" style="--i:10" x="28.2" y="133.3" text-anchor="end">Salalah</text>
+  </g>
+  <g class="om-pulses" aria-hidden="true"><circle class="om-p" r=".75"><animateMotion dur="2.4s" begin="0.00s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-0"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="2.5s" begin="0.45s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-1"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="2.6s" begin="0.90s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-2"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="2.9s" begin="1.35s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-3"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="3.0s" begin="1.80s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-4"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="3.0s" begin="2.25s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-5"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="3.4s" begin="2.70s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-6"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="3.4s" begin="3.15s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-7"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="4.1s" begin="3.60s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-8"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="4.6s" begin="4.05s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-9"/></animateMotion></circle><circle class="om-p" r=".75"><animateMotion dur="6.8s" begin="4.50s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" keyPoints="0;1"><mpath href="#om-r-10"/></animateMotion></circle></g>
+  <g class="om-hub" transform="translate(78.0,42.5)" aria-hidden="true">
     <circle class="om-hub-ring" r="2.6"/>
     <circle class="om-hub-core" r="1.5"/>
   </g>
-  <text class="om-t om-hub-t" x="81.4" y="40.0" text-anchor="start">Silal, Barka</text>
+  <text class="om-t om-hub-t" x="81.4" y="39.9" text-anchor="start">Silal, Barka</text>
 </svg>
       </div>
       <div class="om-side">
         <div class="om-k">Where we deliver</div>
         <p class="om-lead">From one unit at Silal to every governorate in Oman, twice a week.</p>
+        <div class="om-card" id="omCard" aria-live="polite">
+          <div class="om-card-k" id="omCardK">Every governorate</div>
+          <div class="om-card-v" id="omCardV">11 of 11</div>
+          <div class="om-card-m" id="omCardM">Twice a week from Silal</div>
+        </div>
+        <p class="om-hint">Hover or tap a governorate.</p>
         <ul class="om-legend">
           <li><i class="om-lg om-lg-hub"></i><span>Our unit at Silal, Barka</span></li>
           <li><i class="om-lg om-lg-d"></i><span>Governorate capitals we deliver to</span></li>
@@ -2241,7 +2346,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="aisle-copy">
       <span class="aisle-k">Where it ends up</span>
       <h2 class="aisle-h">Every shelf here<br>was a crate at 04:00.</h2>
-      <p class="aisle-p">Nothing on this wall is more than a day old. That is the whole promise.</p>
+      <p class="aisle-p">Nothing on this wall is more than a day old.</p>
     </div>
     <div class="aisle-prog" aria-hidden="true"><i></i></div>
   </div>
@@ -2318,7 +2423,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         
         
       </ol>
-      <p>These are blank on purpose. Nothing here is invented &mdash; every gap is
+      <p>These are blank on purpose. Nothing here is invented. Every gap is
          something only you can fill, and it stays visible until you do.</p>
     </section>
     <footer>
@@ -3243,14 +3348,47 @@ ScrollTrigger.refresh();
 
 <script>
 (function(){
-  /* The supply map draws its routes once, the first time it is on screen.
-     Without ScrollTrigger (or with reduced motion) it is simply shown drawn. */
+  /* The supply map draws its routes once, the first time it is on screen;
+     after that a quiet tour steps through the governorates until the reader
+     hovers or taps one, and the card beside the map names whatever is lit. */
   var om = document.getElementById("omap");
   if (om) {
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || !window.ScrollTrigger) om.classList.add("on");
-    else ScrollTrigger.create({ trigger: om, start: "top 78%", once: true,
-                                onEnter: function(){ om.classList.add("on"); } });
+    var govs = [].slice.call(om.querySelectorAll(".om-gov"));
+    var cardK = document.getElementById("omCardK"), cardV = document.getElementById("omCardV"), cardM = document.getElementById("omCardM");
+    var isAr = document.documentElement.lang === "ar";
+    var DEF = isAr ? ["كل المحافظات", "١١ من ١١", "مرتين في الأسبوع من سلال"]
+                   : ["Every governorate", "11 of 11", "Twice a week from Silal"];
+    var touched = false, tour = null, k = 0, inView = false;
+    function show(i){
+      govs.forEach(function(g, n){ g.classList.toggle("is-on", n === i); });
+      if (i < 0) { cardK.textContent = DEF[0]; cardV.textContent = DEF[1]; cardM.textContent = DEF[2]; return; }
+      var g = govs[i];
+      cardK.textContent = isAr ? g.dataset.ar : g.dataset.en + " Governorate";
+      cardV.textContent = isAr ? g.dataset.capAr : g.dataset.cap;
+      cardM.textContent = DEF[2];
+    }
+    function stopTour(){ touched = true; if (tour) { clearInterval(tour); tour = null; } }
+    function startTour(){
+      if (touched || reduce || tour || !inView) return;
+      tour = setInterval(function(){ show(k % govs.length); k++; }, 2000);
+    }
+    function pauseTour(){ if (tour) { clearInterval(tour); tour = null; } }
+    govs.forEach(function(g, n){
+      var pick = function(){ stopTour(); show(n); };
+      g.addEventListener("mouseenter", pick);
+      g.addEventListener("focus", pick);
+      g.addEventListener("click", pick);
+      g.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    });
+    om.querySelector(".om-map").addEventListener("mouseleave", function(){ if (touched) show(-1); });
+    function on(){ om.classList.add("on"); setTimeout(startTour, 1400); }
+    if (reduce || !window.ScrollTrigger) { inView = true; on(); }
+    else ScrollTrigger.create({ trigger: om, start: "top 78%", once: true, onEnter: function(){ inView = true; on(); } });
+    /* the tour only runs while the map is actually on screen */
+    if ("IntersectionObserver" in window) new IntersectionObserver(function(es){
+      es.forEach(function(e){ inView = e.isIntersecting; if (inView && om.classList.contains("on")) startTour(); else if (!inView) pauseTour(); });
+    }, { threshold: 0.2 }).observe(om);
   }
   /* The Google map is fetched only when asked for. */
   var btn = document.getElementById("mapLoad"), box = document.getElementById("mapbox");
@@ -3292,7 +3430,8 @@ ScrollTrigger.refresh();
             ".boot-name,.scrollcue,.span-k,.th-k,.who,.clear-note," +
             "a.cta-big,a.cta-alt,.fu-k,.fu-n,.fu-go,.aisle-k,.aisle-p," +
             ".serves-list b,.cl-d,.season-k,.season-v," +
-            ".om-t,.om-k,.om-lead,.om-legend span,.map-load span";
+            ".om-t,.om-k,.om-lead,.om-legend span,.map-load span," +
+            ".om-card-k,.om-card-v,.om-card-m";
   var cache = new WeakMap(), applied = false;
 
   function swap(to){
