@@ -2703,8 +2703,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     var io = new IntersectionObserver(function(es){
       es.forEach(function(e){
         if (!e.isIntersecting) return;
-        var i = [].indexOf.call(beats, e.target);
-        if (i < 0 || i >= layers.length) return;
+        /* the first photograph belongs to the section header; each of the
+           five cards then brings the next, so all six are seen */
+        var i = [].indexOf.call(beats, e.target) + 1;
+        if (i < 1 || i >= layers.length) return;
         for (var n = 0; n < layers.length; n++) layers[n].classList.toggle("on", n === i);
       });
     }, { rootMargin: "-30% 0px -30% 0px", threshold: 0 });
