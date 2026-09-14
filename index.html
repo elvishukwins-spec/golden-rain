@@ -2499,9 +2499,14 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     const films = [...sec.querySelectorAll(".dw")];
     const steps = [...sec.querySelectorAll(".dawn-steps li")];
     const line  = document.getElementById("dawnP");
-    const says  = ["Nobody is awake yet. The yard is, and so are we.",
-                   "Cold room to cold body, without one warm minute in between.",
-                   "By the time the heat arrives, it is somebody else's morning."];
+    /* written by script, so the dictionary never sees it: both languages here */
+    const says  = document.documentElement.lang === "ar"
+      ? ["لم يستيقظ أحد بعد. الساحة مستيقظة، ونحن كذلك.",
+         "من غرفة التبريد إلى الصندوق المبرّد، دون دقيقةٍ دافئة بينهما.",
+         "وحين يصل الحر، يكون الصباح قد صار لغيرنا."]
+      : ["Nobody is awake yet. The yard is, and so are we.",
+         "Cold room to cold body, without one warm minute in between.",
+         "By the time the heat arrives, it is somebody else's morning."];
     let at = -1;
     /* The three dawn clips are stacked and cross-faded on opacity, so all three
        sit inside the viewport at once and the generic in-view handler started
