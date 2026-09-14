@@ -1232,21 +1232,21 @@ html[dir="rtl"] .fu-go{direction:rtl}
 /* the record heading sits inside its own gradient, so lift it clear */
 
 /* ---------- dawn ----------
-   Two real clips of the same yard, an hour apart: the fleet under canopy
-   lights, then the same truck being loaded in violet pre-dawn. (A third,
-   sunrise, was cut at the client's request on 14 Sep.) The argument
+   Three real clips of the same yard, an hour apart: the fleet under canopy
+   lights, the same truck in violet pre-dawn, then the sun itself. The argument
    the whole site makes is that the produce moves before the heat, and this is
    that argument told in light rather than in a sentence. */
-.dawn{position:relative;height:200vh;background:var(--night)}
+.dawn{position:relative;height:300vh;background:var(--night)}
 .dawn-stick{position:sticky;top:0;height:100vh;overflow:hidden}
 .dawn-film{position:absolute;inset:0}
 .dw{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;
   transition:opacity 1.25s cubic-bezier(.22,1,.36,1), transform 1.6s cubic-bezier(.22,1,.36,1);
   transform:scale(1.06)}
 .dw.on{opacity:1;transform:scale(1)}
-/* two different shots want two different centres */
+/* three different shots want three different centres */
 .dw:nth-child(1){object-position:center 44%}
 .dw:nth-child(2){object-position:center 48%}
+.dw:nth-child(3){object-position:center 55%}
 .dawn-veil{position:absolute;inset:0;pointer-events:none;
   background:
     linear-gradient(180deg, rgba(var(--bgc),.86) 0%, rgba(var(--bgc),.22) 26%,
@@ -1263,7 +1263,7 @@ html[dir="rtl"] .fu-go{direction:rtl}
   transition:opacity .5s ease}
 .dawn-steps{list-style:none;position:absolute;z-index:3;left:clamp(22px,6vw,90px);
   right:clamp(22px,6vw,90px);bottom:clamp(48px,7vh,74px);margin:0;padding:0;
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(14px,3vw,40px)}
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 clamp(14px,3vw,40px)}
 .dawn-steps li{padding-top:12px;border-top:1px solid var(--line-soft);
   transition:border-color .5s ease, opacity .5s ease;opacity:.4}
 .dawn-steps li.on{opacity:1;border-top-color:var(--gold)}
@@ -1272,7 +1272,7 @@ html[dir="rtl"] .fu-go{direction:rtl}
 .dawn-steps span{display:block;margin-top:3px;font-family:"IBM Plex Mono",monospace;
   font-size:10.5px;letter-spacing:.08em;color:rgba(var(--fg),.5)}
 @media(max-width:760px){
-  .dawn{height:180vh}
+  .dawn{height:260vh}
   .dawn-copy{bottom:150px;max-width:none}
   .dawn-steps span{display:none}
 }
@@ -2089,7 +2089,6 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <i class="fa" data-bg="assets/img/shop-3.jpg"></i>
     <i class="fa" data-bg="assets/img/shop-4.jpg"></i>
     <i class="fa" data-bg="assets/img/shop-5.jpg"></i>
-    <i class="fa" data-bg="assets/img/shop-6.jpg"></i>
   </div>
   <div class="fresh-veil" aria-hidden="true"></div>
   <div class="inner">
@@ -2138,7 +2137,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
                  aria-label="A loaded truck at the bay, doors open, a worker checking the last row"></video></figure>
       </li>
 
-      <li class="rv">
+      <li class="rv is-last">
         <div class="ch-t">09:00</div>
         <div class="ch-body">
           <h3>On the shelf</h3>
@@ -2149,21 +2148,9 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
                  aria-label="Fruit and vegetables stacked on a supermarket shelf"></video></figure>
       </li>
 
-      <!-- The client asked for a family at the table here. This is the one
-           generated image on the page (GPT Image, 14 Sep) and it is captioned
-           as such in the alt text; everything else on the site is his own
-           footage. The "fifteen hours" went with the figure above. -->
-      <li class="rv is-last">
-        <div class="ch-t">19:30</div>
-        <div class="ch-body">
-          <h3>On the plate</h3>
-          <p>From the market floor to a table somewhere in the Sultanate, the same day. That is the whole job.</p>
-        </div>
-        <figure><img src="assets/img/plate.jpg" srcset="assets/img/plate-m.jpg 640w, assets/img/plate.jpg 1024w"
-                 sizes="(max-width:900px) 100vw, 300px" width="1024" height="688" loading="lazy" decoding="async"
-                 style="object-position:center 66%"
-                 alt="An Omani family sharing an evening meal of fresh fruit, salad and rice at home (illustration)"></figure>
-      </li>
+      <!-- "On the plate" -- the one generated image on the page, a family at the
+           table -- was removed at the client's request (14 Sep, round 6): the
+           day now ends on the shelf, which is his own footage. -->
     </ol>
   </div>
 </section>
@@ -2212,6 +2199,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div class="dawn-film" aria-hidden="true">
       <video class="dw on" data-scrub-in-view src="assets/video/dawn-1.mp4" data-poster="assets/video/posters/dawn-1.jpg" muted playsinline loop preload="none"></video>
       <video class="dw"    data-scrub-in-view src="assets/video/dawn-2.mp4" data-poster="assets/video/posters/dawn-2.jpg" muted playsinline loop preload="none"></video>
+      <video class="dw"    data-scrub-in-view src="assets/video/dawn-3.mp4" data-poster="assets/video/posters/dawn-3.jpg" muted playsinline loop preload="none"></video>
     </div>
     <div class="dawn-veil" aria-hidden="true"></div>
     <div class="dawn-copy">
@@ -2221,6 +2209,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <ol class="dawn-steps" aria-hidden="true">
       <li class="on"><b>Night</b><span>The fleet in, before anyone arrives</span></li>
       <li><b>Loading</b><span>Pallet by pallet, stacked to the roof</span></li>
+      <li><b>Sunrise</b><span>Three trucks loaded, doors open</span></li>
     </ol>
   </div>
 </section>
@@ -2621,8 +2610,8 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
   };
   window.__paintSeason();
 
-  /* The dawn section moves through two real clips of the same yard as you
-     scroll it: canopy lights, then the loading in violet pre-dawn. The copy and the
+  /* The dawn section moves through three real clips of the same yard as you
+     scroll it: canopy lights, violet pre-dawn, then the sun. The copy and the
      step markers follow the light rather than a timer, so what you read always
      matches what you are looking at. */
   (function(){
@@ -2634,9 +2623,11 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     /* written by script, so the dictionary never sees it: both languages here */
     const says  = document.documentElement.lang === "ar"
       ? ["لم يستيقظ أحد بعد. الساحة مستيقظة، ونحن كذلك.",
-         "من غرفة التبريد إلى الصندوق المبرّد، دون دقيقةٍ دافئة بينهما."]
+         "من غرفة التبريد إلى الصندوق المبرّد، دون دقيقةٍ دافئة بينهما.",
+         "وحين يصل الحر، يكون الصباح قد صار لغيرنا."]
       : ["Nobody is awake yet. The yard is, and so are we.",
-         "Cold room to cold body, without one warm minute in between."];
+         "Cold room to cold body, without one warm minute in between.",
+         "By the time the heat arrives, it is somebody else's morning."];
     let at = -1;
     /* The three dawn clips are stacked and cross-faded on opacity, so all three
        sit inside the viewport at once and the generic in-view handler started
@@ -2678,7 +2669,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     show(0);
     ScrollTrigger.create({
       trigger: sec, start: "top top", end: "bottom bottom",
-      onUpdate: self => show(Math.min(1, Math.floor(self.progress * 2.0001)))
+      onUpdate: self => show(Math.min(2, Math.floor(self.progress * 3.0001)))
     });
   })();
 
@@ -2750,7 +2741,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       es.forEach(function(e){
         if (!e.isIntersecting) return;
         /* the first photograph belongs to the section header; each of the
-           five cards then brings the next, so all six are seen */
+           four cards then brings the next, so all five are seen */
         var i = [].indexOf.call(beats, e.target) + 1;
         if (i < 1 || i >= layers.length) return;
         for (var n = 0; n < layers.length; n++) layers[n].classList.toggle("on", n === i);
