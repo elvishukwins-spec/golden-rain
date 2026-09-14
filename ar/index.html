@@ -2975,6 +2975,52 @@ let dur = 0;
    a band rather than full bleed — more of the frame, and scaled DOWN. */
 const PHONE = matchMedia("(max-width:759px) and (orientation:portrait)");
 let wasPortrait = null;
+/* ---- the connection decides the file ----------------------------------
+   The film is 20-52 MB. On a connection that cannot fetch it faster than the
+   reader scrolls through it, every scroll step lands past the buffered edge
+   and the picture stalls: that is the "lag" the client reports, and no
+   encode of the big file fixes it. So the first 1.5s of the download are
+   measured. If the whole file would take longer than about 20s at that rate,
+   the film is swapped for the light tier -- the small size with a twelve-
+   frame GOP, roughly a fifth of the bytes -- while the curtain is still down
+   and nothing is on screen yet. Forward scrolling PLAYS the film now, so the
+   longer GOP costs only on backward seeks. */
+let light = false;
+const lightUrl = p => p ? "../assets/video/hero-p864g.mp4" : "../assets/video/hero-1280g.mp4";
+const probeT0 = performance.now();
+let probed = false;
+/* the end of the buffered range the film is currently inside, or -1 */
+function bufferedEdge(t){
+  const b = hero.buffered;
+  if (!b || !b.length) return -1;
+  for (let i = 0; i < b.length; i++) if (b.start(i) <= t + 0.06 && b.end(i) >= t - 0.06) return b.end(i);
+  return -1;
+}
+hero.addEventListener("progress", () => { if (typeof wake === "function") wake(); });
+function bufferedAhead(){
+  if (!hero.buffered || !hero.buffered.length) return 0;
+  let e = 0;
+  for (let i = 0; i < hero.buffered.length; i++) if (hero.buffered.start(i) < 0.5) e = Math.max(e, hero.buffered.end(i));
+  return e;
+}
+function probe(){
+  if (probed || light || !hero.duration || !isFinite(hero.duration)) return;
+  const el = (performance.now() - probeT0) / 1000;
+  if (el < 1.5) return;
+  probed = true;
+  const got = bufferedAhead();                       /* seconds of film that have arrived */
+  const rate = got / el;                              /* film-seconds per wall-second */
+  const left = (hero.duration - got) / Math.max(rate, 1e-3);
+  if (left > 20) {
+    light = true;
+    const at = hero.currentTime || 0;
+    hero.src = lightUrl(PHONE.matches);
+    hero.load();
+    hero.addEventListener("loadedmetadata", () => { try { hero.currentTime = Math.min(at, hero.duration - 0.05); } catch(e){} }, { once: true });
+  }
+}
+hero.addEventListener("progress", probe);
+setTimeout(probe, 1600);
 
 /* Scrubbing needs the WHOLE file. A plain src lets the browser stop at
    whatever it thinks is "enough to play" (~60%), and any scroll past that
@@ -3028,7 +3074,8 @@ function chooseUrl(){
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType)) || (c.downlink && c.downlink < 6);
   /* the "b" files are the 14 Sep re-join (the passage through the cut); new
      names because the old ones sit in edge caches for thirty days */
-  return [portrait, portrait    ? (slow ? "../assets/video/hero-p1152b.mp4" : "../assets/video/hero-p1440b.mp4")
+  if (slow || light) return [portrait, lightUrl(portrait)];
+  return [portrait, portrait    ? "../assets/video/hero-p1440b.mp4"
                   : need > 1900 ? "../assets/video/hero-2560b.mp4"
                   : need > 1280 ? "../assets/video/hero-1920b.mp4"
                                 : "../assets/video/hero-1280b.mp4"];
@@ -3321,9 +3368,21 @@ function tick(now){
      film's own 24fps instead of a queue of seeks. Scrolling back still seeks
      (a video cannot play backwards), as does any jump too far to chase. */
   if (dur && !seeking) {
-    const T = smoothP * (dur - 0.05);
+    let T = smoothP * (dur - 0.05);
+    /* Never ask for a frame that has not arrived. A seek past the buffered
+       edge is a Range request and a stall, and at 5 Mbps the loop issued
+       hundreds of them through the opener. Hold at the edge instead and let
+       the download (a "progress" event) wake the loop; the film then catches
+       up on its own. The reader sees the picture pause, not stutter. */
+    const edge = bufferedEdge(hero.currentTime);
+    const starving = edge >= 0 && T > edge - 0.08 && T > hero.currentTime;
+    if (starving) T = Math.max(hero.currentTime, edge - 0.08);
+    if (load) {
+      load.classList.toggle("gone", !starving);
+      if (starving && ltxt) { const f = Math.min(1, edge / dur); ltxt.textContent = "Loading the film · " + Math.round(f * 100) + "%"; fill.style.transform = "scaleX(" + f.toFixed(3) + ")"; }
+    }
     const gap = T - hero.currentTime;
-    if (!reduced && !noPlay && gap > 1.5 / FPS && gap < 2.5) {
+    if (!reduced && !noPlay && !starving && gap > 1.5 / FPS && gap < 2.5) {
       const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
       if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
       if (hero.paused) {
