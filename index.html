@@ -82,7 +82,6 @@
     { "@type": "AdministrativeArea", "name": "Ad Dakhiliyah Governorate" },
     { "@type": "AdministrativeArea", "name": "Adh Dhahirah Governorate" },
     { "@type": "AdministrativeArea", "name": "Al Buraimi Governorate" },
-    { "@type": "AdministrativeArea", "name": "Musandam Governorate" },
     { "@type": "AdministrativeArea", "name": "Ash Sharqiyah North Governorate" },
     { "@type": "AdministrativeArea", "name": "Ash Sharqiyah South Governorate" },
     { "@type": "AdministrativeArea", "name": "Al Wusta Governorate" }
@@ -274,51 +273,38 @@ p{margin:0}
 .boot-in{position:relative;align-self:center;justify-self:center;display:grid;justify-items:center;
   gap:18px;padding:0 24px;text-align:center;
   transition:opacity .45s ease,transform .6s cubic-bezier(.76,0,.24,1)}
-.boot-salam{font-family:var(--ar);font-weight:500;font-size:clamp(38px,7vw,74px);line-height:1.2;
-  color:var(--gold);letter-spacing:0;margin-top:6px;
-  text-shadow:0 2px 24px rgba(26,7,18,.6);
-  animation:bootrise 1s cubic-bezier(.22,1,.36,1) .25s both}
+.boot-salam{font-family:var(--ar);font-weight:500;font-size:clamp(42px,7.6vw,84px);line-height:1.25;
+  color:var(--gold);letter-spacing:0;margin-top:8px;padding:0 .1em;
+  text-shadow:0 2px 28px rgba(26,7,18,.7);
+  animation:salamin 1.5s cubic-bezier(.22,1,.36,1) .4s both}
+/* written in from the right, the way it is read */
+@keyframes salamin{from{opacity:0;clip-path:inset(0 0 0 100%);transform:translateY(6px)}
+                   30%{opacity:1}
+                   to{opacity:1;clip-path:inset(0 0 0 0);transform:none}}
 .boot-foot{position:relative}
 .boot-logo{width:clamp(150px,18vw,232px);height:auto;display:block;
   animation:bootrise .9s cubic-bezier(.22,1,.36,1) both}
 @keyframes bootrise{from{opacity:0;transform:translateY(14px) scale(.97)}
                     to{opacity:1;transform:none}}
-.boot-name{font-family:var(--disp);font-size:11px;letter-spacing:.34em;
-  text-transform:uppercase;color:rgba(var(--fg),.78);
-  animation:bootrise 1s cubic-bezier(.22,1,.36,1) .45s both}
+.boot-name{font-family:var(--disp);font-size:11.5px;letter-spacing:.34em;
+  text-transform:uppercase;color:rgba(var(--fg),.8);
+  animation:bootrise 1s cubic-bezier(.22,1,.36,1) 1.5s both}
 html[dir="rtl"] .boot-name{letter-spacing:0;font-size:14px;font-family:var(--ar);text-transform:none}
-/* the bar, and the name made literal above it: a few gold drops falling onto
-   the line while it fills. Transforms and opacity only, seven elements. */
-.boot-load{position:relative;width:min(220px,54vw);padding-top:30px;margin-top:-6px}
-.boot-rain{position:absolute;left:0;right:0;top:0;height:30px;overflow:hidden;pointer-events:none}
-.boot-rain i{position:absolute;top:-22px;width:1.5px;height:18px;border-radius:1px;opacity:0;
-  background:linear-gradient(180deg,rgba(245,167,7,0),var(--gold));box-shadow:0 0 5px rgba(245,167,7,.5);
-  animation:bootrain 1.5s cubic-bezier(.45,0,.85,.45) infinite}
-.boot-rain i:nth-child(1){left:9%;animation-delay:0s;animation-duration:1.55s}
-.boot-rain i:nth-child(2){left:23%;animation-delay:.62s;animation-duration:1.35s}
-.boot-rain i:nth-child(3){left:36%;animation-delay:.21s;animation-duration:1.7s}
-.boot-rain i:nth-child(4){left:50%;animation-delay:.95s;animation-duration:1.45s}
-.boot-rain i:nth-child(5){left:64%;animation-delay:.4s;animation-duration:1.6s}
-.boot-rain i:nth-child(6){left:77%;animation-delay:1.15s;animation-duration:1.4s}
-.boot-rain i:nth-child(7){left:91%;animation-delay:.78s;animation-duration:1.65s}
-@keyframes bootrain{0%{transform:translateY(0);opacity:0}18%{opacity:.95}100%{transform:translateY(52px);opacity:.1}}
-.boot-bar{position:relative;width:100%;height:2px;border-radius:1px;background:rgba(var(--fg),.16);overflow:hidden}
-.boot-bar i{display:block;height:100%;width:100%;background:var(--gold);border-radius:1px;
-  transform:scaleX(0);transform-origin:left center;
-  transition:transform .35s cubic-bezier(.22,1,.36,1)}
-/* a glint travelling the line */
-.boot-bar::after{content:"";position:absolute;inset:0;width:34%;
-  background:linear-gradient(90deg,transparent,rgba(255,244,214,.55),transparent);
-  transform:translateX(-120%);animation:bootsheen 1.9s ease-in-out .3s infinite}
-@keyframes bootsheen{to{transform:translateX(320%)}}
-html[dir="rtl"] .boot-bar i{transform-origin:right center}
+/* one hairline under the greeting, filling as the film arrives. The percentage
+   and the "rain" that stood here are gone: the greeting is the point of this
+   screen, so it is written in with a wipe and the curtain is held long enough
+   for it to be read (BOOT_MIN in the script). */
+.boot-line{width:min(200px,50vw);height:1px;margin-top:4px;background:rgba(var(--fg),.16);overflow:hidden}
+.boot-line i{display:block;height:100%;width:100%;background:var(--gold);
+  transform:scaleX(0);transform-origin:left center;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+html[dir="rtl"] .boot-line i{transform-origin:right center}
 .boot-pct{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;
   color:rgba(var(--fg),.42)}
 .boot-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding:0 clamp(22px,6vw,60px) clamp(22px,4vh,40px);
   font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
   text-transform:uppercase;color:rgba(var(--fg),.4)}
-@media (prefers-reduced-motion:reduce){.boot-logo,.boot-salam,.boot-name,.boot-bg,.boot-rain i{animation:none}.boot-bar::after{display:none}}
+@media (prefers-reduced-motion:reduce){.boot-logo,.boot-salam,.boot-name,.boot-bg{animation:none}}
 
 /* ---------- 1 · THE DESCENT — globe, dive, Silal, truck, one pin ---------- */
 .descent{position:relative;height:900vh;background:var(--night)}
@@ -383,6 +369,18 @@ html[dir="rtl"] .d-beats::before{right:0;left:auto;
 /* opacity and transform are written from the film loop on every frame of a beat
    change; without a layer of its own each write repainted the headline */
 .d-beat{grid-area:1/1;opacity:0;will-change:opacity,transform}
+/* the film's own wait, shown only when the reader is inside the opener and the
+   film has not arrived yet. It had no styles at all until 14 Sep: a bare
+   "Golden Rain / Loading film" in the corner, and no rule for .gone. */
+.d-load{position:absolute;left:50%;bottom:clamp(64px,10vh,96px);z-index:8;transform:translateX(-50%);
+  display:grid;justify-items:center;gap:8px;pointer-events:none;
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(var(--fg),.55);transition:opacity .5s ease}
+.d-loadmark{display:none}
+.d-loadbar{width:min(180px,44vw);height:1px;background:rgba(var(--fg),.16);overflow:hidden}
+.d-loadbar i{display:block;height:100%;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:left center;transition:transform .4s ease}
+.d-load.gone{opacity:0;visibility:hidden}
+.boot-gate .d-load{opacity:0}
 .d-beat .t{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--gold);margin-bottom:14px}
 .d-beat h1,.d-beat h2{font-size:clamp(30px,6vw,66px)}
@@ -513,8 +511,10 @@ html[dir="rtl"] .d-beat .ar-sign::before{margin:0 auto 16px 0}
   background:linear-gradient(rgba(var(--fg),.5),transparent)}
 
 /* ---------- generic section ---------- */
+/* 13vw/168px was measured on the client's Mac (1440 wide) as 336px of bare
+   ground between every two sections -- what he called "lots of space". */
 .sec{position:relative;scroll-margin-top:64px;overflow-x:clip;
-  padding:clamp(96px,13vw,168px) clamp(22px,6vw,90px)}
+  padding:clamp(72px,9vw,120px) clamp(22px,6vw,90px)}
 
 
 .sec.dark{background:var(--night)}
@@ -671,7 +671,8 @@ html[dir="rtl"] .d-beat .ar-sign::before{margin:0 auto 16px 0}
 
 /* ---------- founder ---------- */
 .founder{display:grid;gap:clamp(26px,4vw,52px);grid-template-columns:1fr;align-items:end}
-@media(min-width:860px){.founder{grid-template-columns:.8fr 1.2fr}}
+@media(min-width:860px){.founder{grid-template-columns:.8fr 1.2fr}.founder.founder-solo{grid-template-columns:1fr}}
+.founder-solo{max-width:880px}
 .founder img{width:100%;max-width:340px;aspect-ratio:4/5;object-fit:cover;border-radius:2px;
   filter:grayscale(.15)}
 .founder blockquote{margin:0;font-family:var(--disp);font-weight:300;
@@ -828,7 +829,7 @@ a{color:inherit}
 /* ---------- cold chain: the gap, shown ---------- */
 .cc-head{display:grid;gap:clamp(30px,5vw,70px);grid-template-columns:1fr;align-items:end}
 @media(min-width:900px){.cc-head{grid-template-columns:1.1fr .9fr}
-  #fresh .cc-head{grid-template-columns:1fr}}
+  #fresh .cc-head,#coldchain .cc-head{grid-template-columns:1fr}}
 .thermo{margin:0;display:grid;gap:14px;justify-items:start}
 .th-row{display:grid;gap:2px}
 .th-v{font-family:var(--disp);font-weight:500;font-size:clamp(58px,9vw,116px);
@@ -953,7 +954,7 @@ a{color:inherit}
    record ran 1,613px with no image at all. This is his vehicle, his bay, his
    signboard — the section is about three decades of the same route, and this
    is what that looks like. */
-/* ---- Record: the supply map. One unit, eleven governorates. ---- */
+/* ---- Record: the supply map. One unit, nine governorates served, two drawn. ---- */
 .omap{margin:clamp(30px,4vw,52px) 0 clamp(26px,3.5vw,44px);display:grid;gap:clamp(22px,4vw,48px);
   grid-template-columns:1fr;align-items:center;border:1px solid var(--line-soft);
   background:rgba(var(--fg),.035);padding:clamp(18px,3vw,36px);border-radius:3px}
@@ -1232,8 +1233,9 @@ html[dir="rtl"] .fu-go{direction:rtl}
 /* the record heading sits inside its own gradient, so lift it clear */
 
 /* ---------- dawn ----------
-   Three real clips of the same yard, an hour apart: the fleet under canopy
-   lights, the same truck in violet pre-dawn, then the sun itself. The argument
+   Three real clips, an hour apart: the fleet under canopy lights, a man
+   loading cartons through the dock door (IMG_4223, in for the open-box shot
+   that read as the bay clip again, 14 Sep), then three trucks at sunrise. The argument
    the whole site makes is that the produce moves before the heat, and this is
    that argument told in light rather than in a sentence. */
 .dawn{position:relative;height:300vh;background:var(--night)}
@@ -1496,6 +1498,7 @@ body{background:var(--plum)}
    words carry the section until the portrait arrives. */
 @media (max-width: 760px){
   #founder .inner{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:start}
+  #founder .inner.founder-solo{grid-template-columns:1fr}   /* no frame: the quote takes the width */
   .founder-hold{aspect-ratio:4/5;width:96px}
   .fh-mark{font-size:34px}
   .fh-note{position:static;margin-top:6px;font-size:9.5px;letter-spacing:.14em;padding:0 2px}
@@ -1864,11 +1867,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <img class="boot-logo" src="assets/logo-color.svg" width="982" height="590" alt="Golden Rain Establishment">
     <div class="boot-salam" lang="ar" dir="rtl">السلام عليكم</div>
     <div class="boot-name">Welcome to Golden Rain</div>
-    <div class="boot-load" aria-hidden="true">
-      <span class="boot-rain"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <div class="boot-bar"><i id="bootFill"></i></div>
-    </div>
-    <div class="boot-pct" id="bootPct">0%</div>
+    <div class="boot-line" aria-hidden="true"><i id="bootFill"></i></div>
   </div>
   <div class="boot-foot">
     <span>Silal &middot; Khazaen Economic City, Barka</span>
@@ -2006,15 +2005,15 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <div>
       <div class="kicker rv" data-n="02">Silal · Khazaen Economic City, Barka</div>
       <h2 class="lead rv">We don't buy at the market. We work inside it.</h2>
-      <p class="sub rv">Our unit sits within Silal, Oman's central fruit and vegetable market. We have direct access and first pick, and nothing sits between the trading floor and our cold room. It is why the produce that reaches you is a day fresher than it has any right to be.</p>
-      <p class="sub rv" style="margin-top:14px">Silal opened in 2024 and replaced Al Mawaleh as the Sultanate's produce hub. We traded through the old market for most of three decades, and moved with it.</p>
+      <p class="sub rv">Our unit is inside Silal, Oman's central fruit and vegetable market. First pick, every morning. Straight from the floor to our cold room.</p>
+      <p class="sub rv" style="margin-top:14px">Silal opened in 2024. Before it, Al Mawaleh, for nearly three decades. We moved with the market.</p>
       <!-- The numbered Bought / Cold list came out at the client's request
            (14 Sep), along with "Bought by eye" and the aisle caption. The
            paragraph above already says it. -->
       <!-- Promoted from a footnote to the point of the section. It was set as
            a small mono aside under the list, which is where a reader's eye
            goes last; the client wanted it made the thing you actually read. -->
-      <p class="pullout rv">Everything is under one roof at Silal: the importers, the wholesalers, customs and the laboratories. That is how a whole day comes off the clock.</p>
+      <p class="pullout rv">Importers, wholesalers, customs and the labs, all under one roof. A whole day saved.</p>
       <p class="pullout rv">Your trusted distributor of fresh fruits and vegetables across Oman.</p>
     </div>
     <figure class="rv">
@@ -2032,31 +2031,16 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <div>
         <div class="kicker rv" data-n="03" style="color:var(--gold)">The cold chain</div>
         <h2 class="lead rv">Once it is cold,<br>it stays cold.</h2>
-        <p class="sub rv" style="color:rgba(var(--fg),.78)">We check and pack it by hand, put it straight into our own cold room, and move it in refrigerated vans. It is not opened again until it gets to you.</p>
+        <p class="sub rv" style="color:rgba(var(--fg),.78)">Packed by hand. Into our cold room. Out in refrigerated vans. Not opened again until it reaches you.</p>
       </div>
-      <!-- The held temperature is UNCONFIRMED: MASTER-PROMPT.md:139 and
-           SITE-CONTENTS.md:202 both record it as unknown. Show the unbroken
-           chain, which is true, rather than a number nobody has given us. -->
-      <figure class="thermo rv" aria-label="Four handovers, one unbroken chain">
-        <div class="th-row">
-          <div class="th-v">4</div>
-          <div class="th-k">Handovers, start to finish</div>
-        </div>
-        <div class="th-bar" aria-hidden="true"><span></span></div>
-        <ol class="span-t" style="max-width:340px">
-          <li><b>01</b><span>Market</span></li>
-          <li><b>02</b><span>Cold room</span></li>
-          <li><b>03</b><span>Vehicle</span></li>
-          <li><b>04</b><span>Your door</span></li>
-        </ol>
-        <figcaption>Closed at the first, opened at the last</figcaption>
-      </figure>
+      <!-- The "4 handovers" figure that stood here was removed at the client's
+           request (14 Sep, round 7): it said what the headline already says. -->
     </div>
     <div class="dip dip-3">
       <figure class="rv">
         <video data-scrub-in-view src="assets/video/scrub-load.mp4" data-poster="assets/video/posters/scrub-load.jpg" muted playsinline loop
                preload="none" aria-label="Pallets stacked at the open cold room door"></video>
-        <figcaption>The insulated door, standing open at the bay</figcaption>
+        <figcaption>The cold room door, open at the bay</figcaption>
       </figure>
       <figure class="rv">
         <!-- The client's own footage of his cold room. The first cut used the
@@ -2071,7 +2055,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <figure class="rv">
         <video data-scrub-in-view src="assets/video/scrub-stacks.mp4" data-poster="assets/video/posters/scrub-stacks.jpg" muted playsinline loop
                preload="none" aria-label="A worker walking between pallets stacked to the ceiling"></video>
-        <figcaption>Stacked to the ceiling, all of it under temperature.</figcaption>
+        <figcaption>Stacked to the ceiling. All of it cold.</figcaption>
       </figure>
     </div>
   </div>
@@ -2097,7 +2081,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <div class="kicker rv" data-n="04">Freshness</div>
     <h2 class="lead rv">Fresh is not a promise.<br>It is a <em>timetable</em>.</h2>
     <p class="standfirst rv">One day, in order.</p>
-        <p class="sub rv">Everything below happens between the market opening and your kitchen door.</p>
+        <p class="sub rv">From the market floor to your kitchen, in one day.</p>
       </div>
       <!-- The 15 hrs figure was removed at the client's request (14 Sep). -->
     </div>
@@ -2107,7 +2091,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <div class="ch-t">04:00</div>
         <div class="ch-body">
           <h3>On the floor at Silal</h3>
-          <p>Bought by eye at the trading hall in Barka, before most of the country is awake.</p>
+          <p>First pick on the trading floor, before the country wakes.</p>
         </div>
         <figure><video data-scrub-in-view src="assets/video/play-silal-pick.mp4" data-poster="assets/video/posters/play-silal-pick.jpg"
                  muted playsinline loop preload="none"
@@ -2118,7 +2102,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <div class="ch-t">05:40</div>
         <div class="ch-body">
           <h3>Hand graded</h3>
-          <p>Checked and packed crate by crate. If it is not at its peak it does not go on the truck.</p>
+          <p>Checked and packed, crate by crate. Only the best goes on the truck.</p>
         </div>
         <figure><video data-scrub-in-view src="assets/video/play-3724.mp4" data-poster="assets/video/posters/play-3724.jpg" muted playsinline loop preload="none"></video></figure>
       </li>
@@ -2137,20 +2121,32 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
                  aria-label="A loaded truck at the bay, doors open, a worker checking the last row"></video></figure>
       </li>
 
-      <li class="rv is-last">
+      <li class="rv">
         <div class="ch-t">09:00</div>
         <div class="ch-body">
           <h3>On the shelf</h3>
-          <p>Stacked and faced in the shop before the first customer walks in. This is where our name stops being on the box.</p>
+          <p>Stacked and faced before the first customer walks in.</p>
         </div>
         <figure><video data-scrub-in-view src="assets/video/scrub-shelf.mp4" data-poster="assets/video/posters/scrub-shelf.jpg"
                  muted playsinline loop preload="none"
                  aria-label="Fruit and vegetables stacked on a supermarket shelf"></video></figure>
       </li>
 
-      <!-- "On the plate" -- the one generated image on the page, a family at the
-           table -- was removed at the client's request (14 Sep, round 6): the
-           day now ends on the shelf, which is his own footage. -->
+      <!-- The family at the table: the one generated image on the page (GPT
+           Image, 14 Sep), captioned as such in the alt text. It went out for an
+           hour on 14 Sep through a misread; what the client wanted gone was the
+           last BACKGROUND photograph of this section, not this. -->
+      <li class="rv is-last">
+        <div class="ch-t">19:30</div>
+        <div class="ch-body">
+          <h3>On the plate</h3>
+          <p>Market floor to family table, the same day.</p>
+        </div>
+        <figure><img src="assets/img/plate.jpg" srcset="assets/img/plate-m.jpg 640w, assets/img/plate.jpg 1024w"
+                 sizes="(max-width:900px) 100vw, 300px" width="1024" height="688" loading="lazy" decoding="async"
+                 style="object-position:center 66%"
+                 alt="An Omani family sharing an evening meal of fresh fruit, salad and rice at home (illustration)"></figure>
+      </li>
     </ol>
   </div>
 </section>
@@ -2166,10 +2162,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 
 
       
-        <p class="sub rv">The grade and the grower are printed on the box. Nothing here was set up for a photograph. It is what was on the floor that morning.</p>
+        <p class="sub rv">Grade and grower, printed on every box. Nothing staged. This is the floor that morning.</p>
       </div>
-      <figure class="span rv" aria-label="Twenty-four origins">
-        <div class="span-v">24<i>origins</i></div>
+      <figure class="span rv" aria-label="More than twenty-four origins">
+        <div class="span-v">24+<i>origins</i></div>
         <div class="span-k">Landing at one market</div>
         </figure>
     </div>
@@ -2198,7 +2194,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
   <div class="dawn-stick">
     <div class="dawn-film" aria-hidden="true">
       <video class="dw on" data-scrub-in-view src="assets/video/dawn-1.mp4" data-poster="assets/video/posters/dawn-1.jpg" muted playsinline loop preload="none"></video>
-      <video class="dw"    data-scrub-in-view src="assets/video/dawn-2.mp4" data-poster="assets/video/posters/dawn-2.jpg" muted playsinline loop preload="none"></video>
+      <video class="dw"    data-scrub-in-view src="assets/video/dawn-2b.mp4" data-poster="assets/video/posters/dawn-2b.jpg" muted playsinline loop preload="none"></video>
       <video class="dw"    data-scrub-in-view src="assets/video/dawn-3.mp4" data-poster="assets/video/posters/dawn-3.jpg" muted playsinline loop preload="none"></video>
     </div>
     <div class="dawn-veil" aria-hidden="true"></div>
@@ -2221,7 +2217,8 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <h2 class="lead rv">Nearly three decades<br>on the roads of Oman.</h2>
     <!-- The loading-bay film was replaced at the client's request (14 Sep)
          with a map of where the trucks actually go: one unit at Silal, every
-         governorate. The eleven governorates are Natural Earth 10m admin-1
+         governorate. Nine are served; Dhofar and Musandam are drawn dashed
+         (Khasab came off the list on 14 Sep, Duqm went on). Natural Earth 10m admin-1
          (public domain) as inline SVG, 20 KB, no third party, both themes and
          both languages. Routes draw in once when the figure scrolls into
          view; delivery pulses then run along them; hovering or tapping a
@@ -2229,12 +2226,12 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
          lands and the breathing at the hub are drawn on a canvas over the SVG
          from one loop that only runs while the map is on screen (see the
          script); the card follows whichever delivery landed last. -->
-    <figure class="omap rv is-off" id="omap" aria-label="Map of Oman showing deliveries from Silal, Barka to ten governorates and their towns">
+    <figure class="omap rv is-off" id="omap" aria-label="Map of Oman showing deliveries from Silal, Barka to nine governorates and their towns">
       <div class="om-map">
 <canvas class="om-fx" aria-hidden="true"></canvas>
 <svg class="om-svg" viewBox="0 0 108 142" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="group" aria-labelledby="omTitle">
-  <title id="omTitle">Map of Oman: one unit at Silal, Barka, deliveries to ten governorates and their towns</title>
-  <g class="om-gov om-gov-off" aria-hidden="true"><path class="om-shape" d="M4.1,105.6L4.0,105.3L5.4,104.8L7.6,104.0L9.8,103.3L11.9,102.5L14.1,101.7L16.3,100.9L18.5,100.1L20.6,99.3L22.8,98.6L25.0,97.8L27.2,97.0L29.3,96.2L31.5,95.4L33.7,94.7L35.9,93.9L38.0,93.1L40.2,92.3L42.1,91.6L42.5,90.3L42.6,90.0L42.9,89.3L43.2,88.1L43.7,86.5L44.3,84.7L44.9,82.7L45.6,80.5L46.3,78.2L46.8,76.5L47.0,76.8L62.5,103.0L73.5,106.0L70.5,106.5L68.9,107.0L66.8,107.9L65.9,108.5L65.4,108.8L65.1,109.0L65.0,109.3L64.9,109.4L63.5,110.8L63.3,111.3L63.2,112.0L63.3,112.4L63.3,112.6L63.3,112.7L63.1,113.0L63.0,113.2L62.9,113.5L62.9,113.6L62.9,114.2L62.8,114.8L62.1,116.4L62.3,116.6L62.3,116.9L62.1,117.2L61.8,117.4L61.3,117.7L61.0,117.8L60.6,118.5L60.5,118.6L60.4,118.7L60.3,118.7L59.7,119.4L59.6,119.5L59.7,119.8L59.5,119.8L57.5,119.6L57.3,119.6L56.9,119.8L56.6,119.9L55.5,119.8L55.3,119.8L54.4,120.1L54.0,120.3L50.7,120.4L49.4,120.8L49.2,120.8L49.1,120.8L49.0,120.9L48.9,120.9L48.9,121.0L48.6,121.0L48.6,121.0L48.2,121.1L48.1,121.2L47.9,121.4L47.7,121.9L47.6,122.2L47.4,122.4L47.4,122.5L47.2,123.1L47.1,123.1L46.9,123.3L45.8,124.4L45.4,125.0L45.3,125.3L45.3,125.6L45.3,126.0L45.5,126.2L45.9,126.4L46.1,126.7L46.2,127.0L46.2,127.6L46.2,127.9L45.6,128.6L45.6,128.7L45.6,128.9L45.6,129.1L45.7,129.2L45.8,129.2L45.8,129.3L45.7,129.5L45.6,129.6L45.3,129.7L45.2,129.8L45.1,129.9L45.1,130.0L45.0,130.3L44.9,130.5L44.9,130.6L44.8,130.7L44.4,130.8L44.2,130.9L44.2,131.1L44.1,131.3L44.0,131.4L43.8,131.5L43.3,132.1L42.8,132.5L42.7,132.5L42.5,132.3L42.4,132.4L42.2,132.6L42.1,132.7L41.9,132.8L41.7,132.8L41.5,132.9L41.4,132.8L41.2,133.0L40.9,133.1L40.4,133.2L40.0,133.4L39.8,133.4L39.6,133.2L39.5,133.3L39.2,133.2L39.1,133.3L38.7,133.0L38.6,133.1L38.5,132.8L38.4,132.6L38.3,132.4L37.7,132.3L37.4,132.2L37.2,132.2L37.1,132.2L36.8,132.2L36.7,132.3L36.2,132.2L36.0,132.2L35.9,132.2L35.6,132.3L35.6,132.4L35.0,132.2L34.7,132.2L34.4,132.4L34.3,132.3L34.2,132.3L31.8,132.5L30.8,132.5L30.6,132.6L30.0,132.9L29.9,133.0L29.8,133.1L29.8,133.2L29.8,133.3L29.9,133.4L29.8,133.6L29.6,133.7L29.6,133.8L29.5,133.9L29.1,134.0L28.6,134.0L27.8,134.2L27.5,134.2L27.3,134.3L27.1,134.5L26.8,134.6L26.6,134.5L26.3,134.7L26.0,134.9L25.7,135.3L25.6,135.5L25.5,135.7L25.3,135.8L24.8,136.0L24.4,136.1L22.4,136.2L21.3,136.3L19.2,137.0L18.1,137.6L17.3,135.7L16.5,133.9L15.7,132.0L15.0,130.2L14.5,129.0L14.3,128.8L14.1,128.8L13.6,128.7L13.4,128.6L13.5,128.6L13.5,128.6L13.6,128.6L13.2,127.6L12.6,126.3L12.1,125.0L11.5,123.6L11.0,122.3L10.4,121.0L9.9,119.7L9.3,118.3L8.8,117.0L8.3,115.7L7.7,114.4L7.2,113.0L6.6,111.7L6.1,110.4L5.5,109.1L5.0,107.7L4.4,106.4L4.1,105.6ZM53.0,126.0L53.0,125.8L53.0,125.8L53.0,125.8L53.1,125.7L53.2,125.6L53.4,125.6L53.6,125.7L53.7,125.8L53.7,125.8L53.5,125.9L53.2,125.9L53.0,126.0L53.0,126.0ZM55.8,125.0L55.8,125.0L55.9,125.2L55.9,125.2L56.0,125.4L56.2,125.5L56.3,125.6L55.9,125.8L55.7,125.9L55.5,126.0L55.0,125.9L54.8,125.9L54.7,125.6L55.0,125.4L55.5,125.2L55.8,125.0Z"/></g>
+  <title id="omTitle">Map of Oman: one unit at Silal, Barka, deliveries to nine governorates and their towns</title>
+  <g class="om-gov om-gov-off" aria-hidden="true"><path class="om-shape" d="M4.1,105.6L4.0,105.3L5.4,104.8L7.6,104.0L9.8,103.3L11.9,102.5L14.1,101.7L16.3,100.9L18.5,100.1L20.6,99.3L22.8,98.6L25.0,97.8L27.2,97.0L29.3,96.2L31.5,95.4L33.7,94.7L35.9,93.9L38.0,93.1L40.2,92.3L42.1,91.6L42.5,90.3L42.6,90.0L42.9,89.3L43.2,88.1L43.7,86.5L44.3,84.7L44.9,82.7L45.6,80.5L46.3,78.2L46.8,76.5L47.0,76.8L62.5,103.0L73.5,106.0L70.5,106.5L68.9,107.0L66.8,107.9L65.9,108.5L65.4,108.8L65.1,109.0L65.0,109.3L64.9,109.4L63.5,110.8L63.3,111.3L63.2,112.0L63.3,112.4L63.3,112.6L63.3,112.7L63.1,113.0L63.0,113.2L62.9,113.5L62.9,113.6L62.9,114.2L62.8,114.8L62.1,116.4L62.3,116.6L62.3,116.9L62.1,117.2L61.8,117.4L61.3,117.7L61.0,117.8L60.6,118.5L60.5,118.6L60.4,118.7L60.3,118.7L59.7,119.4L59.6,119.5L59.7,119.8L59.5,119.8L57.5,119.6L57.3,119.6L56.9,119.8L56.6,119.9L55.5,119.8L55.3,119.8L54.4,120.1L54.0,120.3L50.7,120.4L49.4,120.8L49.2,120.8L49.1,120.8L49.0,120.9L48.9,120.9L48.9,121.0L48.6,121.0L48.6,121.0L48.2,121.1L48.1,121.2L47.9,121.4L47.7,121.9L47.6,122.2L47.4,122.4L47.4,122.5L47.2,123.1L47.1,123.1L46.9,123.3L45.8,124.4L45.4,125.0L45.3,125.3L45.3,125.6L45.3,126.0L45.5,126.2L45.9,126.4L46.1,126.7L46.2,127.0L46.2,127.6L46.2,127.9L45.6,128.6L45.6,128.7L45.6,128.9L45.6,129.1L45.7,129.2L45.8,129.2L45.8,129.3L45.7,129.5L45.6,129.6L45.3,129.7L45.2,129.8L45.1,129.9L45.1,130.0L45.0,130.3L44.9,130.5L44.9,130.6L44.8,130.7L44.4,130.8L44.2,130.9L44.2,131.1L44.1,131.3L44.0,131.4L43.8,131.5L43.3,132.1L42.8,132.5L42.7,132.5L42.5,132.3L42.4,132.4L42.2,132.6L42.1,132.7L41.9,132.8L41.7,132.8L41.5,132.9L41.4,132.8L41.2,133.0L40.9,133.1L40.4,133.2L40.0,133.4L39.8,133.4L39.6,133.2L39.5,133.3L39.2,133.2L39.1,133.3L38.7,133.0L38.6,133.1L38.5,132.8L38.4,132.6L38.3,132.4L37.7,132.3L37.4,132.2L37.2,132.2L37.1,132.2L36.8,132.2L36.7,132.3L36.2,132.2L36.0,132.2L35.9,132.2L35.6,132.3L35.6,132.4L35.0,132.2L34.7,132.2L34.4,132.4L34.3,132.3L34.2,132.3L31.8,132.5L30.8,132.5L30.6,132.6L30.0,132.9L29.9,133.0L29.8,133.1L29.8,133.2L29.8,133.3L29.9,133.4L29.8,133.6L29.6,133.7L29.6,133.8L29.5,133.9L29.1,134.0L28.6,134.0L27.8,134.2L27.5,134.2L27.3,134.3L27.1,134.5L26.8,134.6L26.6,134.5L26.3,134.7L26.0,134.9L25.7,135.3L25.6,135.5L25.5,135.7L25.3,135.8L24.8,136.0L24.4,136.1L22.4,136.2L21.3,136.3L19.2,137.0L18.1,137.6L17.3,135.7L16.5,133.9L15.7,132.0L15.0,130.2L14.5,129.0L14.3,128.8L14.1,128.8L13.6,128.7L13.4,128.6L13.5,128.6L13.5,128.6L13.6,128.6L13.2,127.6L12.6,126.3L12.1,125.0L11.5,123.6L11.0,122.3L10.4,121.0L9.9,119.7L9.3,118.3L8.8,117.0L8.3,115.7L7.7,114.4L7.2,113.0L6.6,111.7L6.1,110.4L5.5,109.1L5.0,107.7L4.4,106.4L4.1,105.6ZM53.0,126.0L53.0,125.8L53.0,125.8L53.0,125.8L53.1,125.7L53.2,125.6L53.4,125.6L53.6,125.7L53.7,125.8L53.7,125.8L53.5,125.9L53.2,125.9L53.0,126.0L53.0,126.0ZM55.8,125.0L55.8,125.0L55.9,125.2L55.9,125.2L56.0,125.4L56.2,125.5L56.3,125.6L55.9,125.8L55.7,125.9L55.5,126.0L55.0,125.9L54.8,125.9L54.7,125.6L55.0,125.4L55.5,125.2L55.8,125.0Z"/></g><g class="om-gov om-gov-off" aria-hidden="true"><path class="om-shape" d="M59.6,19.0L59.5,19.3L59.1,19.5L58.9,19.6L58.7,19.8L58.3,20.0L58.1,20.1L57.9,20.1L57.8,20.0L57.8,19.9L57.7,19.8L57.8,19.5L58.1,19.3L58.2,19.2L58.2,19.1L58.1,18.9L58.1,18.7L58.4,18.5L58.8,18.5L59.1,18.9L59.6,19.0ZM57.1,14.0L57.0,14.0L57.0,13.8L56.9,13.2L56.9,13.0L57.1,12.8L57.2,12.7L57.3,12.5L57.3,12.3L57.0,12.0L56.9,11.7L57.0,11.5L57.2,11.2L57.3,11.0L57.3,9.8L57.4,9.3L57.5,9.1L57.4,8.8L57.2,8.3L57.0,8.3L56.4,8.4L56.1,8.5L56.1,8.5L56.2,8.3L56.3,7.8L57.1,6.5L57.4,5.9L57.6,5.8L57.8,5.7L57.8,5.8L57.8,5.9L57.9,6.2L57.9,6.2L57.8,6.4L57.9,6.4L58.0,6.3L58.4,6.3L58.4,6.2L58.5,6.2L58.7,6.2L58.8,6.4L58.9,6.6L59.0,6.5L59.1,6.5L59.2,6.5L59.3,6.5L59.7,6.3L59.8,6.3L60.2,6.4L60.3,6.3L60.3,6.2L60.2,6.1L60.1,6.0L60.0,6.0L59.8,5.9L59.6,6.0L59.5,6.0L59.5,6.1L59.3,6.2L59.2,6.3L59.0,6.3L59.0,6.1L59.1,5.5L59.1,5.3L59.5,5.6L59.7,5.7L59.7,5.5L59.7,5.4L59.5,5.2L59.4,5.1L59.2,5.0L59.3,4.9L59.3,4.9L59.4,4.9L59.5,4.9L59.7,4.7L59.7,4.5L59.7,4.2L59.7,4.0L59.8,4.0L60.0,4.4L60.2,4.2L60.3,4.2L60.4,4.3L60.3,4.4L60.3,4.4L60.3,4.5L60.4,4.6L60.5,4.5L60.6,4.5L60.6,4.6L60.7,4.7L61.0,4.7L61.2,4.8L61.3,4.7L61.3,4.7L61.2,4.5L61.2,4.5L61.5,4.4L61.6,4.7L61.6,4.9L61.4,4.9L61.1,4.9L60.9,4.9L60.5,5.3L60.3,5.4L60.3,5.4L60.3,5.5L60.2,5.6L60.5,5.9L60.6,6.0L60.8,6.1L60.9,6.0L61.0,5.9L61.2,5.9L61.3,6.1L61.1,6.5L61.0,6.5L60.9,6.3L60.8,6.3L60.6,6.3L60.7,6.4L60.7,6.5L60.7,6.5L60.6,6.6L60.8,6.8L61.0,6.9L61.1,7.0L61.2,7.3L61.1,7.3L60.9,7.3L60.8,7.2L60.7,7.1L60.5,7.2L60.4,7.1L60.3,7.0L60.3,6.7L60.2,6.8L60.0,6.9L59.9,6.9L59.9,6.8L59.9,6.7L60.0,6.6L60.1,6.5L59.8,6.5L59.5,6.7L59.3,6.9L59.4,7.1L59.3,7.2L59.3,7.4L59.3,7.6L59.4,7.8L59.5,7.5L59.6,7.3L59.7,7.3L59.8,7.4L59.8,7.5L59.8,7.7L59.7,7.9L60.0,8.0L61.1,7.9L61.0,8.1L60.8,8.3L60.4,8.5L60.1,8.6L60.0,8.8L60.0,9.0L60.3,8.8L60.5,9.0L60.5,9.2L60.2,9.4L60.3,9.6L60.4,9.8L60.5,9.9L60.6,9.9L60.9,10.0L60.8,10.1L60.8,10.1L60.7,10.3L60.5,10.2L60.3,10.2L60.1,10.2L60.0,10.3L60.2,10.6L60.1,10.9L59.9,11.2L59.7,11.5L59.7,11.6L59.7,11.9L59.5,12.2L59.3,12.6L59.1,12.7L59.0,12.8L59.0,12.5L58.8,12.8L58.6,13.3L58.5,13.8L58.6,14.2L58.7,14.4L58.1,14.5L57.9,14.6L57.7,14.5L57.7,14.4L57.5,14.2L57.4,14.1L57.1,14.0L57.1,14.0Z"/></g>
   <g class="om-gov" data-i="0" data-en="Al Batinah South" data-ar="محافظة جنوب الباطنة" data-cap="Rustaq" data-cap-ar="الرستاق" data-towns="Nakhal · Al Musanaah · Al Awabi" data-towns-ar="نخل · المصنعة · العوابي" tabindex="0" role="button" aria-label="Al Batinah South Governorate: Rustaq, Nakhal · Al Musanaah · Al Awabi">
     <path class="om-shape" d="M74.6,39.1L75.3,39.4L76.0,39.6L76.6,39.7L76.9,39.7L77.7,39.6L78.0,39.7L78.3,40.2L78.5,40.3L78.8,40.4L79.1,40.5L79.4,40.6L81.1,40.5L81.7,40.5L82.2,40.6L82.1,40.7L82.1,40.8L82.1,40.8L81.7,42.7L82.1,44.1L79.3,46.4L78.9,47.2L75.6,47.7L75.2,47.5L73.7,47.3L69.9,43.5L71.5,43.0L73.1,41.6L74.6,39.1Z"/>
     <path class="om-r" id="om-r-0" style="--i:0" pathLength="1" d="M78.0,42.5Q75.4,43.3 73.2,45.1"/>
@@ -2283,18 +2280,12 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     <g class="om-towns"><circle class="om-tw" style="--j:0" cx="54.7" cy="31.3" r=".6"><title>Mahdah</title></circle><circle class="om-tw" style="--j:1" cx="54.3" cy="40.2" r=".6"><title>As Sunaynah</title></circle></g>
     <circle class="om-d" style="--i:7" cx="52.5" cy="33.3" r="1.1"/>
     <text class="om-t" style="--i:7" x="49.9" y="34.2" text-anchor="end">Al Buraimi</text>
-  </g><g class="om-gov" data-i="8" data-en="Musandam" data-ar="محافظة مسندم" data-cap="Khasab" data-cap-ar="خصب" data-towns="Bukha · Dibba · Madha" data-towns-ar="بخاء · دبا · مدحاء" tabindex="0" role="button" aria-label="Musandam Governorate: Khasab, Bukha · Dibba · Madha">
-    <path class="om-shape" d="M59.6,19.0L59.5,19.3L59.1,19.5L58.9,19.6L58.7,19.8L58.3,20.0L58.1,20.1L57.9,20.1L57.8,20.0L57.8,19.9L57.7,19.8L57.8,19.5L58.1,19.3L58.2,19.2L58.2,19.1L58.1,18.9L58.1,18.7L58.4,18.5L58.8,18.5L59.1,18.9L59.6,19.0ZM57.1,14.0L57.0,14.0L57.0,13.8L56.9,13.2L56.9,13.0L57.1,12.8L57.2,12.7L57.3,12.5L57.3,12.3L57.0,12.0L56.9,11.7L57.0,11.5L57.2,11.2L57.3,11.0L57.3,9.8L57.4,9.3L57.5,9.1L57.4,8.8L57.2,8.3L57.0,8.3L56.4,8.4L56.1,8.5L56.1,8.5L56.2,8.3L56.3,7.8L57.1,6.5L57.4,5.9L57.6,5.8L57.8,5.7L57.8,5.8L57.8,5.9L57.9,6.2L57.9,6.2L57.8,6.4L57.9,6.4L58.0,6.3L58.4,6.3L58.4,6.2L58.5,6.2L58.7,6.2L58.8,6.4L58.9,6.6L59.0,6.5L59.1,6.5L59.2,6.5L59.3,6.5L59.7,6.3L59.8,6.3L60.2,6.4L60.3,6.3L60.3,6.2L60.2,6.1L60.1,6.0L60.0,6.0L59.8,5.9L59.6,6.0L59.5,6.0L59.5,6.1L59.3,6.2L59.2,6.3L59.0,6.3L59.0,6.1L59.1,5.5L59.1,5.3L59.5,5.6L59.7,5.7L59.7,5.5L59.7,5.4L59.5,5.2L59.4,5.1L59.2,5.0L59.3,4.9L59.3,4.9L59.4,4.9L59.5,4.9L59.7,4.7L59.7,4.5L59.7,4.2L59.7,4.0L59.8,4.0L60.0,4.4L60.2,4.2L60.3,4.2L60.4,4.3L60.3,4.4L60.3,4.4L60.3,4.5L60.4,4.6L60.5,4.5L60.6,4.5L60.6,4.6L60.7,4.7L61.0,4.7L61.2,4.8L61.3,4.7L61.3,4.7L61.2,4.5L61.2,4.5L61.5,4.4L61.6,4.7L61.6,4.9L61.4,4.9L61.1,4.9L60.9,4.9L60.5,5.3L60.3,5.4L60.3,5.4L60.3,5.5L60.2,5.6L60.5,5.9L60.6,6.0L60.8,6.1L60.9,6.0L61.0,5.9L61.2,5.9L61.3,6.1L61.1,6.5L61.0,6.5L60.9,6.3L60.8,6.3L60.6,6.3L60.7,6.4L60.7,6.5L60.7,6.5L60.6,6.6L60.8,6.8L61.0,6.9L61.1,7.0L61.2,7.3L61.1,7.3L60.9,7.3L60.8,7.2L60.7,7.1L60.5,7.2L60.4,7.1L60.3,7.0L60.3,6.7L60.2,6.8L60.0,6.9L59.9,6.9L59.9,6.8L59.9,6.7L60.0,6.6L60.1,6.5L59.8,6.5L59.5,6.7L59.3,6.9L59.4,7.1L59.3,7.2L59.3,7.4L59.3,7.6L59.4,7.8L59.5,7.5L59.6,7.3L59.7,7.3L59.8,7.4L59.8,7.5L59.8,7.7L59.7,7.9L60.0,8.0L61.1,7.9L61.0,8.1L60.8,8.3L60.4,8.5L60.1,8.6L60.0,8.8L60.0,9.0L60.3,8.8L60.5,9.0L60.5,9.2L60.2,9.4L60.3,9.6L60.4,9.8L60.5,9.9L60.6,9.9L60.9,10.0L60.8,10.1L60.8,10.1L60.7,10.3L60.5,10.2L60.3,10.2L60.1,10.2L60.0,10.3L60.2,10.6L60.1,10.9L59.9,11.2L59.7,11.5L59.7,11.6L59.7,11.9L59.5,12.2L59.3,12.6L59.1,12.7L59.0,12.8L59.0,12.5L58.8,12.8L58.6,13.3L58.5,13.8L58.6,14.2L58.7,14.4L58.1,14.5L57.9,14.6L57.7,14.5L57.7,14.4L57.5,14.2L57.4,14.1L57.1,14.0L57.1,14.0Z"/>
-    <path class="om-r" id="om-r-8" style="--i:8" pathLength="1" d="M78.0,42.5Q71.0,23.1 58.3,6.8"/>
-    <g class="om-towns"><circle class="om-tw" style="--j:0" cx="57.0" cy="7.2" r=".6"><title>Bukha</title></circle><circle class="om-tw" style="--j:1" cx="58.5" cy="14.5" r=".6"><title>Dibba</title></circle><circle class="om-tw" style="--j:2" cx="59.4" cy="19.1" r=".6"><title>Madha</title></circle></g>
-    <circle class="om-d" style="--i:8" cx="58.3" cy="6.8" r="1.1"/>
-    <text class="om-t" style="--i:8" x="60.9" y="7.7" text-anchor="start">Khasab</text>
-  </g><g class="om-gov" data-i="9" data-en="Al Wusta" data-ar="محافظة الوسطى" data-cap="Haima" data-cap-ar="هيماء" data-towns="Duqm · Mahout · Al Jazir" data-towns-ar="الدقم · محوت · الجازر" tabindex="0" role="button" aria-label="Al Wusta Governorate: Haima, Duqm · Mahout · Al Jazir">
+  </g><g class="om-gov" data-i="8" data-en="Al Wusta" data-ar="محافظة الوسطى" data-cap="Duqm" data-cap-ar="الدقم" data-towns="Haima · Mahout · Al Jazir" data-towns-ar="هيماء · محوت · الجازر" tabindex="0" role="button" aria-label="Al Wusta Governorate: Duqm, Haima · Mahout · Al Jazir">
     <path class="om-shape" d="M46.8,76.5L47.0,76.0L47.6,73.8L48.3,71.8L48.8,69.9L49.3,68.4L49.7,67.2L49.9,66.5L50.0,66.2L50.0,66.0L50.3,65.9L59.3,63.9L80.2,74.4L84.2,76.5L85.6,77.2L83.8,83.2L83.5,83.1L83.2,83.2L82.8,83.3L82.4,83.5L81.9,83.7L81.7,83.8L81.6,83.9L81.4,84.6L81.4,84.7L81.5,84.9L81.5,85.0L81.4,85.1L81.3,85.2L80.9,85.2L80.7,85.3L80.5,85.5L80.2,85.8L80.1,85.9L80.0,86.1L80.0,86.3L80.0,86.4L80.2,86.6L80.2,86.7L80.1,87.0L79.9,87.2L79.3,87.4L79.1,87.6L78.9,87.8L78.7,88.0L78.6,88.2L78.6,88.4L78.4,88.6L78.3,88.8L78.3,89.1L78.5,89.7L78.6,90.0L78.4,90.5L78.2,91.3L78.2,91.5L78.2,91.9L77.9,92.6L77.7,93.4L77.5,93.7L76.7,94.9L76.6,95.3L76.7,95.7L76.7,95.9L76.9,96.0L76.9,96.1L77.0,96.3L77.0,96.7L77.0,96.9L76.9,97.1L76.8,97.5L76.8,97.7L76.9,98.0L77.5,99.0L77.6,99.3L77.7,99.7L77.7,100.0L77.6,100.4L77.4,101.0L77.4,101.3L77.4,101.6L77.6,102.3L77.8,102.5L78.1,102.9L78.2,103.1L78.0,103.7L78.0,104.0L78.5,104.9L78.5,105.1L78.2,105.4L78.0,105.5L78.0,105.6L77.4,105.6L77.3,105.7L77.3,105.8L77.1,105.9L77.0,106.0L76.9,106.0L74.2,105.9L73.5,106.0L62.5,103.0L47.0,76.8L46.8,76.5Z"/>
-    <path class="om-r" id="om-r-9" style="--i:9" pathLength="1" d="M78.0,42.5Q65.3,66.1 58.6,92.1"/>
-    <g class="om-towns"><circle class="om-tw" style="--j:0" cx="76.8" cy="96.1" r=".6"><title>Duqm</title></circle><circle class="om-tw" style="--j:1" cx="78.1" cy="85.1" r=".6"><title>Mahout</title></circle><circle class="om-tw" style="--j:2" cx="62.4" cy="111.0" r=".6"><title>Al Jazir</title></circle></g>
-    <circle class="om-d" style="--i:9" cx="58.6" cy="92.1" r="1.1"/>
-    <text class="om-t" style="--i:9" x="56.0" y="93.0" text-anchor="end">Haima</text>
+    <path class="om-r" id="om-r-8" style="--i:8" pathLength="1" d="M78.0,42.5Q74.2,69.2 76.8,96.1"/>
+    <g class="om-towns"><circle class="om-tw" style="--j:0" cx="58.6" cy="92.1" r=".6"><title>Haima</title></circle><circle class="om-tw" style="--j:1" cx="78.1" cy="85.1" r=".6"><title>Mahout</title></circle><circle class="om-tw" style="--j:2" cx="62.4" cy="111.0" r=".6"><title>Al Jazir</title></circle></g>
+    <circle class="om-d" style="--i:8" cx="76.8" cy="96.1" r="1.1"/>
+    <text class="om-t" style="--i:8" x="79.4" y="97.0" text-anchor="start">Duqm</text>
   </g>
   <g class="om-hub" transform="translate(78.0,42.5)" aria-hidden="true">
     <circle class="om-hub-core" r="1.5"/>
@@ -2304,10 +2295,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       </div>
       <div class="om-side">
         <div class="om-k">Where we deliver</div>
-        <p class="om-lead">From one unit at Silal to ten governorates, twice a week.</p>
+        <p class="om-lead">From one unit at Silal to nine governorates, twice a week.</p>
         <div class="om-card" id="omCard" aria-live="polite">
-          <div class="om-card-k" id="omCardK">Ten governorates</div>
-          <div class="om-card-v" id="omCardV">46 places</div>
+          <div class="om-card-k" id="omCardK">Nine governorates</div>
+          <div class="om-card-v" id="omCardV">42 places</div>
           <div class="om-card-m" id="omCardM">Twice a week from Silal</div>
         </div>
         <p class="om-hint">Hover or tap a governorate.</p>
@@ -2317,13 +2308,13 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         </ul>
       </div>
       <!-- the same 46 places the card names, as a slow line under the map -->
-      <div class="om-ticker" aria-hidden="true"><div class="om-ticker-in" id="omTicker"><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Khasab</span><i></i><span>Bukha</span><i></i><span>Dibba</span><i></i><span>Madha</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Haima</span><i></i><span>Duqm</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Khasab</span><i></i><span>Bukha</span><i></i><span>Dibba</span><i></i><span>Madha</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Haima</span><i></i><span>Duqm</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i></div></div>
+      <div class="om-ticker" aria-hidden="true"><div class="om-ticker-in" id="omTicker"><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Duqm</span><i></i><span>Haima</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i><span>Rustaq</span><i></i><span>Nakhal</span><i></i><span>Al Musanaah</span><i></i><span>Al Awabi</span><i></i><span>Muscat</span><i></i><span>Seeb</span><i></i><span>Al Amerat</span><i></i><span>Qurayyat</span><i></i><span>Nizwa</span><i></i><span>Bahla</span><i></i><span>Samail</span><i></i><span>Izki</span><i></i><span>Adam</span><i></i><span>Bidbid</span><i></i><span>Al Hamra</span><i></i><span>Manah</span><i></i><span>Ibra</span><i></i><span>Al Mudhaibi</span><i></i><span>Bidiyah</span><i></i><span>Al Qabil</span><i></i><span>Wadi Bani Khalid</span><i></i><span>Ibri</span><i></i><span>Yanqul</span><i></i><span>Dhank</span><i></i><span>Sohar</span><i></i><span>Saham</span><i></i><span>Al Khaburah</span><i></i><span>Suwaiq</span><i></i><span>Liwa</span><i></i><span>Shinas</span><i></i><span>Sur</span><i></i><span>Al Kamil Wal Wafi</span><i></i><span>Jalan Bani Bu Ali</span><i></i><span>Jalan Bani Bu Hassan</span><i></i><span>Masirah</span><i></i><span>Al Buraimi</span><i></i><span>Mahdah</span><i></i><span>As Sunaynah</span><i></i><span>Duqm</span><i></i><span>Haima</span><i></i><span>Mahout</span><i></i><span>Al Jazir</span><i></i></div></div>
     </figure>
 
     <div class="figs" id="recordFigs">
       <div class="fig rv"><span class="k">28</span><span class="l">years supplying Oman</span></div>
       <div class="fig rv"><span class="k">6</span><span class="l">markets served daily</span></div>
-      <div class="fig rv"><span class="k">2&times;</span><span class="l">deliveries a week, ten governorates</span></div>
+      <div class="fig rv"><span class="k">2&times;</span><span class="l">deliveries a week, nine governorates</span></div>
     </div>
     <!-- Six markets, named in their own deck. One long-standing client is described but not named here;
          the second was removed at the client's request (14 Sep). The "awaiting from you" boxes that
@@ -2337,7 +2328,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
       <li class="rv"><span class="sv-n">06</span><b>Food service suppliers</b></li>
     </ul>
     <div class="proof">
-      <p class="rv"><b>A hypermarket group in Oman.</b> A multi-year partnership built on uninterrupted daily supply, during which they grew from a single location to nine.</p>
+      <p class="rv"><b>A hypermarket group in Oman.</b> Daily supply for years, as they grew from one store to nine.</p>
       <p class="rv quote-own">&ldquo;From a single restaurant kitchen to a ten-store hypermarket chain, we scale with you.&rdquo;</p>
     </div>
 
@@ -2346,11 +2337,10 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
 
 <!-- ============ 7 · FOUNDER ============ -->
 <section class="sec light" id="founder" data-run="Golden Rain &middot; 07 / The partner" style="padding-top:0">
-  <div class="inner founder">
-    <div class="founder-hold" role="img" aria-label="Portrait of the managing partner, to be supplied">
-          <span class="fh-mark">GR</span>
-          <span class="fh-note">Portrait<br>to come</span>
-        </div>
+  <!-- The portrait frame that held this column open ("GR / Portrait to come")
+       was an empty box on the client's screen. Until the portrait arrives the
+       quote stands alone; put the frame back as the first grid child then. -->
+  <div class="inner founder founder-solo">
     <div>
       <blockquote class="rv">We don't just deliver produce. We deliver partnership, reliability, and peace of mind.</blockquote>
       <!-- --magenta is the deep brand magenta, meant for fills. As type on the
@@ -2406,7 +2396,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <div class="lbl" style="margin-top:26px">Hours</div>
         <span class="quiet">Trading from 04:00. Delivery before the heat.</span>
         <div class="lbl" style="margin-top:26px">Coverage</div>
-        <span class="quiet">Ten governorates, twice a week, and more often when a customer needs it.</span>
+        <span class="quiet">Nine governorates, twice a week. More often when you need it.</span>
       </div>
       <div class="cbox rv">
         <div class="lbl">Find us</div>
@@ -2740,8 +2730,9 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
     var io = new IntersectionObserver(function(es){
       es.forEach(function(e){
         if (!e.isIntersecting) return;
-        /* the first photograph belongs to the section header; each of the
-           four cards then brings the next, so all five are seen */
+        /* the first photograph belongs to the section header; the cards then
+           bring the next in turn (five photographs, five cards, the last card
+           keeps the fifth: the sixth photograph was cut by the client) */
         var i = [].indexOf.call(beats, e.target) + 1;
         if (i < 1 || i >= layers.length) return;
         for (var n = 0; n < layers.length; n++) layers[n].classList.toggle("on", n === i);
@@ -3154,18 +3145,23 @@ function frame(p){
    film buffered to scrub the opening. No fake timer. */
 const boot = document.getElementById("boot");
 const bootFill = document.getElementById("bootFill");
-const bootPct  = document.getElementById("bootPct");
 let bootDone = false;
+/* The curtain used to lift the moment the film could be scrubbed -- under a
+   second on a good connection, before the greeting had finished writing
+   itself. The client asked where the greeting was. Hold at least this long,
+   measured from the first paint; the 8s cap below still applies. */
+const BOOT_MIN = 2600, bootT0 = performance.now();
+let bootHold = 0;
 const marks = { fonts:0, meta:0, buffer:0 };
 
 function bootTick(){
   if (bootDone) return;
   const pct = Math.round((marks.fonts*0.2 + marks.meta*0.2 + marks.buffer*0.6) * 100);
   bootFill.style.transform = "scaleX(" + (pct / 100) + ")";
-  bootPct.textContent = pct + "%";
   if (pct >= 99) {
+    const left = BOOT_MIN - (performance.now() - bootT0);
+    if (left > 0) { if (!bootHold) bootHold = setTimeout(() => { bootHold = 0; bootTick(); }, left); return; }
     bootDone = true;
-    bootPct.textContent = "100%";
     bootFill.style.transform = "scaleX(1)";
     setTimeout(() => {
       boot.classList.add("done");
@@ -3395,8 +3391,9 @@ ScrollTrigger.refresh();
 <script>
 (function(){
   /* The supply map draws its routes once, the first time it is on screen.
-     Everything that MOVES after that -- the deliveries running the routes,
-     the ripple where one lands, the breath at the hub -- is drawn on a canvas
+     Everything that MOVES after that -- the trucks on the routes, the flow
+     along each road, the ripple where one lands, the breath at the hub -- is
+     drawn on a canvas
      laid over the SVG, from one rAF loop that only runs while the figure is
      on screen. It used to be SMIL animateMotion and a CSS keyframe inside the
      SVG: traced at 1,250 layout invalidations in twelve wheel notches while
@@ -3413,8 +3410,8 @@ ScrollTrigger.refresh();
   var isAr = document.documentElement.lang === "ar";
   var places = govs.reduce(function(t, g){ return t + 1 + (g.dataset.towns ? g.dataset.towns.split(" · ").length : 0); }, 0);
   var AR_DIGITS = function(n){ return String(n).replace(/\d/g, function(d){ return "٠١٢٣٤٥٦٧٨٩"[d]; }); };
-  var DEF = isAr ? ["عشر محافظات", AR_DIGITS(places) + " مكاناً", "مرتين في الأسبوع من سلال"]
-                 : ["Ten governorates", places + " places", "Twice a week from Silal"];
+  var DEF = isAr ? ["تسع محافظات", AR_DIGITS(places) + " مكاناً", "مرتين في الأسبوع من سلال"]
+                 : ["Nine governorates", places + " places", "Twice a week from Silal"];
   var touched = false, inView = false, lit = false, lastShow = 0;
 
   function show(i){
@@ -3467,9 +3464,9 @@ ScrollTrigger.refresh();
     }
     var L = len[N];
     return { pts: pts, len: len, L: L, end: pts[N], i: i,
-             dur: 2400 + L * 70,                 /* ms on the road: longer roads take longer */
+             dur: 3200 + L * 110,                /* ms on the road: longer roads take longer; a truck, not a comet */
              wait: 1400 + (i * 733) % 2200,      /* each waits a different while at the hub */
-             off: i * 590,                       /* so they never all leave together */
+             off: i * 1300,                      /* so they never all leave together */
              landed: false };
   });
   var hub = routes[0].pts[0];
@@ -3480,12 +3477,13 @@ ScrollTrigger.refresh();
     var a = r.pts[lo-1], b = r.pts[lo], seg = r.len[lo] - r.len[lo-1] || 1, t = (d - r.len[lo-1]) / seg;
     return [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t];
   }
-  var col = { gold: "#F5A707", pink: "#E73391", paper: "#FBF6EC" };
+  var col = { gold: "#F5A707", pink: "#E73391", paper: "#FBF6EC", night: "#1C0713" };
   function palette(){
     var cs = getComputedStyle(om);
     col.gold = cs.getPropertyValue("--gold").trim() || col.gold;
     col.pink = cs.getPropertyValue("--pink").trim() || col.pink;
     col.paper = cs.getPropertyValue("--paper").trim() || col.paper;
+    col.night = cs.getPropertyValue("--night").trim() || col.night;
   }
   var DPR = 1, SC = 1;
   function size(){
@@ -3505,6 +3503,19 @@ ScrollTrigger.refresh();
     if (touched || now - lastShow < 2600) return;
     lastShow = now; show(i);
   }
+  /* a small truck, drawn pointing along +x; the cab leads */
+  function rrect(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); ctx.fill(); }
+  function truck(x, y, ang){
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(1.3, 1.3);
+    if (Math.cos(ang) < 0) ctx.scale(1, -1);        /* heading west: keep the wheels underneath */
+    ctx.globalAlpha = .16; ctx.fillStyle = col.gold; ctx.beginPath(); ctx.arc(-.3, 0, 2.7, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = col.night; ctx.beginPath(); ctx.arc(-1.2, .78, .36, 0, 6.2832); ctx.arc(.9, .78, .36, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = col.gold;  rrect(-2.0, -.85, 2.55, 1.55, .2);        /* the box */
+    ctx.fillStyle = col.paper; rrect(.62, -.48, 1.0, 1.18, .2);          /* the cab */
+    ctx.fillStyle = col.night; ctx.globalAlpha = .55; ctx.fillRect(.52, -.85, .1, 1.55); ctx.globalAlpha = 1;
+    ctx.restore();
+  }
   function draw(now){
     raf = 0;
     if (!inView || !lit || document.hidden) { tPrev = 0; return; }
@@ -3515,6 +3526,15 @@ ScrollTrigger.refresh();
     ctx.setTransform(SC, 0, 0, SC, 0, 0);            /* draw in viewBox units */
     ctx.clearRect(0, 0, VW, VH);
     ctx.lineCap = "round";
+    /* the roads carry a slow flow toward each destination */
+    ctx.setLineDash([.6, 1.4]); ctx.lineDashOffset = -((T / 1000) * 1.3 % 2);
+    ctx.strokeStyle = col.gold; ctx.globalAlpha = .5; ctx.lineWidth = .34;
+    for (var q = 0; q < routes.length; q++) {
+      var pts = routes[q].pts; ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+      for (var m = 1; m < pts.length; m++) ctx.lineTo(pts[m][0], pts[m][1]);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
     /* the hub breathes: one ring leaves every 2.6s */
     var ph = (T % 2600) / 2600;
     ring(hub[0], hub[1], 1.4 + ph * 5.2, col.pink, (1 - ph) * .85, .32);
@@ -3522,22 +3542,12 @@ ScrollTrigger.refresh();
       var r = routes[i], cyc = r.dur + r.wait, p = (T + r.off) % cyc;
       if (p < r.dur) {
         r.landed = false;
-        var f = easeIO(p / r.dur), head = at(r, f);
-        /* the tail: eight short strokes behind the head, fading and thinning */
-        for (var k = 8; k >= 1; k--) {
-          var fb = f - (k - 1) * .02, fa = f - k * .02;
-          if (fb <= 0) continue;
-          var A = at(r, Math.max(0, fa)), B = at(r, fb);
-          ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
-          ctx.strokeStyle = col.gold; ctx.globalAlpha = (1 - k / 9) * .8; ctx.lineWidth = .3 + (1 - k / 9) * .55; ctx.stroke();
-        }
-        dot(head[0], head[1], 2.3, col.gold, .16);
-        dot(head[0], head[1], .95, col.gold, 1);
-        dot(head[0], head[1], .42, col.paper, .95);
+        var f = easeIO(p / r.dur), head = at(r, f), back = at(r, Math.max(0, f - .012));
+        truck(head[0], head[1], Math.atan2(head[1] - back[1], head[0] - back[0]));
       } else {
         var since = p - r.dur;
         if (!r.landed) { r.landed = true; land(i, now); }
-        if (since < 1000) { var q = since / 1000; ring(r.end[0], r.end[1], 1.2 + q * 4.2, col.gold, (1 - q) * .85, .34); }
+        if (since < 1000) { var q2 = since / 1000; ring(r.end[0], r.end[1], 1.2 + q2 * 4.2, col.gold, (1 - q2) * .85, .34); }
         if (since < 380) dot(r.end[0], r.end[1], 1.1 + (1 - since / 380) * .9, col.paper, .9 * (1 - since / 380));
       }
     }
