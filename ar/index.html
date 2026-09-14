@@ -307,6 +307,8 @@ html[dir="rtl"] .boot-line i{transform-origin:right center}
 
 /* ---------- 1 · THE DESCENT — globe, dive, Silal, truck, one pin ---------- */
 .descent{position:relative;height:900vh;background:var(--night)}
+/* a phone screen is short and a fling is long: more height per second of film */
+@media (max-width:759px) and (orientation:portrait){ .descent{height:1100vh} }
 .descent-stick{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:var(--night)}
 .d-earth{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   object-position:center 42%;
@@ -2974,6 +2976,16 @@ let dur = 0;
    look soft. hero-m1200 is a 4:3 centre crop at full source height, shown in
    a band rather than full bleed — more of the frame, and scaled DOWN. */
 const PHONE = matchMedia("(max-width:759px) and (orientation:portrait)");
+/* A thumb-fling is not a wheel notch. It moves the page thousands of pixels
+   in well under a second, which on this opener is several seconds of film,
+   and the film cannot play that fast. On touch the target is eased more
+   heavily, the film may run faster, and it is allowed to fall further behind
+   before the loop gives up and seeks (a seek is a jump, and a jump is the
+   "cut" the client felt on the phone and never on the laptop). */
+const COARSE = matchMedia("(pointer: coarse)").matches;
+const EASE_K = COARSE ? 0.10 : 0.24;      /* fraction of the remaining distance closed per 60fps frame */
+const RATE_MAX = COARSE ? 4 : 3;          /* playbackRate ceiling while chasing */
+const LEASH = COARSE ? 6 : 2.5;           /* seconds behind before a seek is used instead */
 let wasPortrait = null;
 /* ---- the connection decides the file ----------------------------------
    The film is 20-52 MB. On a connection that cannot fetch it faster than the
@@ -3355,7 +3367,7 @@ function tick(now){
      and a seek into the master costs 128ms, so the film starts every step
      behind already. 0.24 closes the same curve in half the time and issues no
      more seeks: one is in flight at a time either way. */
-  smoothP += d * (1 - Math.pow(1 - 0.24, dt * 60));
+  smoothP += d * (1 - Math.pow(1 - EASE_K, dt * 60));
   if (Math.abs(d) < 0.0002) smoothP = targetP;
 
   /* Forward, and within reach: PLAY toward the target instead of seeking.
@@ -3382,8 +3394,8 @@ function tick(now){
       if (starving && ltxt) { const f = Math.min(1, edge / dur); ltxt.textContent = "Loading the film · " + Math.round(f * 100) + "%"; fill.style.transform = "scaleX(" + f.toFixed(3) + ")"; }
     }
     const gap = T - hero.currentTime;
-    if (!reduced && !noPlay && !starving && gap > 1.5 / FPS && gap < 2.5) {
-      const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
+    if (!reduced && !noPlay && !starving && gap > 1.5 / FPS && gap < LEASH) {
+      const rate = Math.min(RATE_MAX, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
       if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
       if (hero.paused) {
         chasing = true;
