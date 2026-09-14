@@ -3387,15 +3387,20 @@ function tick(now){
        the download (a "progress" event) wake the loop; the film then catches
        up on its own. The reader sees the picture pause, not stutter. */
     const edge = bufferedEdge(hero.currentTime);
-    const starving = edge >= 0 && T > edge - 0.08 && T > hero.currentTime;
-    if (starving) T = Math.max(hero.currentTime, edge - 0.08);
+    /* the margin is under the play threshold (1.5 frames), so a film parked
+       at its edge is not asked to play into nothing sixty times a second */
+    const starving = edge >= 0 && T > edge - 0.05 && T > hero.currentTime;
+    if (starving) T = Math.max(hero.currentTime, edge - 0.05);
     if (load) {
       load.classList.toggle("gone", !starving);
       if (starving && ltxt) { const f = Math.min(1, edge / dur); ltxt.textContent = "Loading the film · " + Math.round(f * 100) + "%"; fill.style.transform = "scaleX(" + f.toFixed(3) + ")"; }
     }
     const gap = T - hero.currentTime;
-    if (!reduced && !noPlay && !starving && gap > 1.5 / FPS && gap < LEASH) {
-      const rate = Math.min(RATE_MAX, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
+    if (!reduced && !noPlay && gap > 1.5 / FPS && gap < LEASH) {   /* toward a clamped target this plays up to the edge and stops */
+      /* the sharp portrait file is 1440x2024: at 4x that is 280 Mpx/s of decode, past what a
+         mid-range phone can hold; 3x keeps it inside */
+      const cap = hero.videoHeight > 1700 ? 3 : RATE_MAX;
+      const rate = Math.min(cap, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
       if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
       if (hero.paused) {
         chasing = true;
