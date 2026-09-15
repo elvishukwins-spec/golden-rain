@@ -3169,17 +3169,18 @@ function stripArrived(j){
      dozen frames (0.8 MB) took over two seconds, the line is under ~3 Mbps
      and the rest of the strip comes every second frame -- six a second,
      half the bytes -- rather than a picture that waits on the download */
-  if (strip.loaded === 12 && strip.every === 1) {
-    const took = performance.now() - strip.t0;
-    if (took > 4000) strip.every = 4; else if (took > 2000) strip.every = 2;
+  if (strip.loaded === 1) strip.t0 = performance.now();      /* the clock starts when bytes start */
+  if (strip.loaded === 13 && strip.every === 1) {
+    const took = performance.now() - strip.t0;                /* twelve frames, ~0.9 MB */
+    if (took > 3200) strip.every = 4; else if (took > 1600) strip.every = 2;   /* under ~2 Mbps, under ~4 Mbps */
     if (strip.every > 1) { stripOrder = stripOrder.filter(i => i % strip.every === 0); stripCursor = 0; }
   }
   /* the curtain: metadata is moot, and "buffered" is the first dozen frames
      of the coarse pass -- four seconds of film a third of a second apart */
   marks.meta = 1;
-  marks.buffer = Math.max(marks.buffer, Math.min(1, strip.loaded / 12));
+  marks.buffer = Math.max(marks.buffer, Math.min(1, strip.loaded / 8));
   bootTick();
-  if (!opened && strip.loaded >= 6 && strip.state[0] === 2) openHero();
+  if (!opened && strip.loaded >= 4 && strip.state[0] >= 2) openHero();
   if (typeof wake === "function") wake();   /* a frame the reader may be waiting on */
 }
 function stripStart(){
