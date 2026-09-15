@@ -3041,7 +3041,8 @@ const WIN_BACK = 2, WIN_AHEAD = 7;         /* live decoded frames behind / ahead
 /* state: 0 not asked, 1 fetching, 2 in the cache, 3 failed, 5 Image live, 4 Image decoded */
 const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N), seen: new Uint8Array(STRIP_N),
                 loaded: 0, idx: -1, drawn: -1, drawT: 0, deferred: false, dir: 1, speed: 0, cv: null, ctx: null,
-                every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false };
+                every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false,
+                cap: 30, lat: 0, rev: 0 };
 const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
 let stripCursor = 0, stripInflight = 0, stripOrder = [];
 const stripAllowed = j => j >= 0 && j < STRIP_N && j % strip.every === 0;
@@ -3077,12 +3078,20 @@ function stripLive(j){
   if (strip.state[j] >= 4) return;
   const im = new Image();
   im.decoding = "async";
+  const born = performance.now();
   im.onload = () => {
     if (strip.imgs[j] !== im) return;                 /* released while loading */
     if (!strip.seen[j]) { strip.seen[j] = 1; if (strip.state[j] !== 2) { strip.loaded++; stripArrived(j); } }
     if (Math.abs(j - strip.idx) <= 2) wake();         /* drawable now, decoded or not */
     (im.decode ? im.decode() : Promise.resolve())
-      .then(() => { if (strip.imgs[j] === im) { strip.state[j] = 4; if (Math.abs(j - strip.idx) <= 2) wake(); } })
+      .then(() => {
+        if (strip.imgs[j] !== im) return;
+        strip.state[j] = 4;
+        /* the phone's decode latency, load included, smoothed; capacity from it */
+        strip.lat = strip.lat ? strip.lat * 0.8 + (performance.now() - born) * 0.2 : performance.now() - born;
+        strip.cap = Math.min(60, Math.max(12, 3000 / strip.lat));
+        if (Math.abs(j - strip.idx) <= 2) wake();
+      })
       .catch(() => {});
   };
   im.onerror = () => { if (strip.imgs[j] === im) { strip.imgs[j] = null; strip.state[j] = 3; } };
@@ -3099,7 +3108,7 @@ function stripRelease(j){
 }
 /* the window: at speed it strides -- at 192 frames a second the screen shows
    every third frame at best, and decoding the ones between is wasted */
-function stripWindow(idx, dt){
+function stripWindow(idx, dt, now){
   /* Strides are powers of two, chosen from a SMOOTHED rate with hysteresis:
      the raw rate wobbles with every uneven animation frame, and a stride that
      flipped 1-2-4 with it released frames before they had finished loading
@@ -3109,14 +3118,17 @@ function stripWindow(idx, dt){
   strip.rateS = strip.rate ? strip.rateS + (strip.rate - strip.rateS) * Math.min(1, (dt || 1 / 60) * 6) : 0;
   const r = strip.rateS, cur = strip.stride;
   let st = cur;
-  /* a frame costs a load and a decode, about thirty a second on a phone; past
-     that the film shows every second frame at a steady cadence rather than
-     dropping frames at random */
-  if (r > 160) st = 8; else if (r > 80 && cur < 4) st = 4; else if (r > 30 && cur < 2) st = 2;
-  if (r < 96 && cur === 8) st = 4;
-  if (r < 48 && st === 4 && cur !== 8) st = 2;
+  /* A frame costs a load and a decode, and how many of those a second THIS
+     phone manages is measured, not assumed: every frame is timed from its
+     creation to its decode, and the capacity is about three of those in
+     flight at once. The stride is the smallest power of two that keeps the
+     decode rate under that, with a band so it does not flicker. */
+  const cap = strip.cap;
+  if (r / cur > cap) st = cur < 8 ? cur * 2 : 8;
+  else if (cur > 1 && r / (cur / 2) < cap * 0.75) st = cur / 2;
   if (r < 20) st = 1;
   strip.stride = st;
+
   const lo = strip.dir > 0 ? idx - WIN_BACK * st : idx - WIN_AHEAD * st;
   const hi = strip.dir > 0 ? idx + WIN_AHEAD * st : idx + WIN_BACK * st;
   const keep = [];
@@ -3126,7 +3138,11 @@ function stripWindow(idx, dt){
        and still loading: release, it would be skipped anyway. */
     const out = j < lo || j > hi;
     const misaligned = st > 1 && j % st !== 0 && j !== idx;
-    if (out || (misaligned && strip.state[j] !== 4)) stripRelease(j); else keep.push(j);
+    if (out || (misaligned && strip.state[j] !== 4)) {
+      /* released while still ahead and undecoded: the decoder is behind the
+         reader; the cap comes down and the stride goes up */
+      stripRelease(j);
+    } else keep.push(j);
   }
   strip.live = keep;
   const base = st > 1 ? Math.round(idx / st) * st : idx;
@@ -3137,22 +3153,27 @@ function stripWindow(idx, dt){
     }
   }
 }
-/* The frame to show: the exact frame if decoded; else a decoded neighbour
-   within reach (two frames at a drag, more at speed, when the eye cannot
-   tell and a decode on the main thread would cost the frame); else the exact
-   frame even if it must decode now; else the nearest live frame; else
-   nothing (the poster shows). */
+/* The frame to show. The exact frame if decoded. Else a decoded frame BETWEEN
+   the last one drawn and the target, in the direction of travel, closest to
+   the target -- never on the far side of the target and never behind what is
+   already showing, so the picture only ever moves the way the reader is
+   going (a stand-in taken from either side made it step forward and back:
+   "scrambling"). Else the exact frame even if it must decode now (the caller
+   rate-limits that). Else hold what is showing. */
 function stripNearest(idx){
-  const st = strip.state;
-  if (st[idx] === 4) return idx;
+  const st = strip.state, d = strip.dir, from = strip.drawn;
+  const ok4 = j => j >= 0 && j < STRIP_N && st[j] === 4;
+  const okAny = j => j >= 0 && j < STRIP_N && (st[j] === 4 || (st[j] === 5 && strip.imgs[j] && strip.imgs[j].complete && strip.imgs[j].naturalWidth));
+  if (ok4(idx)) return idx;
   const reach = Math.max(2, Math.min(12, strip.speed), strip.stride * 2);
   for (let k = 1; k <= reach; k++) {
-    if (idx - k >= 0 && st[idx - k] === 4) return idx - k;
-    if (idx + k < STRIP_N && st[idx + k] === 4) return idx + k;
+    const j = idx - k * d;
+    if (from >= 0 && (d > 0 ? j <= from : j >= from)) break;
+    if (ok4(j)) return j;
   }
-  const ok = j => j >= 0 && j < STRIP_N && (st[j] === 4 || (st[j] === 5 && strip.imgs[j] && strip.imgs[j].complete && strip.imgs[j].naturalWidth));
-  if (ok(idx)) return idx;
-  for (let k = 1; k < STRIP_N; k++) { if (ok(idx - k)) return idx - k; if (ok(idx + k)) return idx + k; }
+  if (okAny(idx)) return idx;
+  if (from >= 0) return from;
+  for (let k = 1; k < STRIP_N; k++) { if (okAny(idx - k)) return idx - k; if (okAny(idx + k)) return idx + k; }
   return -1;
 }
 function stripSize(){
@@ -3197,7 +3218,7 @@ function stripArrived(j){
   marks.buffer = Math.max(marks.buffer, Math.min(1, strip.loaded / 8));
   bootTick();
   if (!opened && strip.loaded >= 4 && (strip.state[0] >= 2 || strip.seen[0])) openHero();
-  if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD * strip.stride) { stripWindow(Math.max(0, strip.idx)); wake(); }
+  if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD * strip.stride) { stripWindow(Math.max(0, strip.idx), 0, performance.now()); wake(); }
 }
 function stripStart(){
   strip.on = true;
@@ -3640,8 +3661,15 @@ function tick(now){
     strip.rate = strip.chasing ? rate : 0;            /* arrived: at rest, stride one, the exact frame */
     const idx = Math.round(strip.pos);
     strip.speed = strip.idx < 0 ? 0 : Math.abs(idx - strip.idx);   /* frames per tick */
-    if (idx !== strip.idx) { if (strip.idx >= 0) strip.dir = idx > strip.idx ? 1 : -1; strip.idx = idx; }
-    stripWindow(idx, dt);
+    if (idx !== strip.idx) {
+      if (strip.idx >= 0) {
+        const nd = idx > strip.idx ? 1 : -1;
+        if (nd !== strip.dir) { strip.rev += Math.abs(idx - strip.idx); if (strip.rev >= 3) { strip.dir = nd; strip.rev = 0; } }
+        else strip.rev = 0;
+      }
+      strip.idx = idx;
+    }
+    stripWindow(idx, dt, now);
     const j = stripDraw(idx, now);
     const starving = j < 0 || Math.abs(j - idx) > 8;   /* a third of a second away */
     if (load) {
