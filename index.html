@@ -2549,12 +2549,21 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
        scrolling is meant to remove the steps between wheel notches, not to
        put the page on a delay. 0.8 still interpolates every notch and settles
        inside half a second. */
+    /* Touch goes through Lenis too. Left native, a phone page followed the raw
+       thumb and stopped dead with it, while the laptop's wheel is eased into
+       a glide -- that difference IS "not smooth like the computer". With
+       syncTouch a drag is eased the same way and a flick coasts under
+       Lenis's own inertia, and the film's target moves smoothly with it. */
+    var touchy = matchMedia("(pointer: coarse)").matches;
     lenis = new Lenis({
       duration: 0.8,
       easing: function(t){ return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
       wheelMultiplier: 0.9,
-      touchMultiplier: 1.6,
-      smoothWheel: true
+      touchMultiplier: 1.2,
+      smoothWheel: true,
+      syncTouch: touchy,
+      syncTouchLerp: 0.1,
+      touchInertiaMultiplier: 28
     });
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
@@ -3417,7 +3426,10 @@ function chooseUrl(){
      bytes are not there), so the video stays the sharp file: a handover
      between a soft video and sharp frames would itself read as a cut. */
   if ((slow || light) && !(strip.on && strip.hybrid)) return [portrait, lightUrl(portrait)];
-  return [portrait, portrait    ? "assets/video/hero-p1440b.mp4"
+  /* the phone file is all-intra at crf 25: indistinguishable from the crf 21
+     cut at 1:1 and 11 Mbps instead of 15.5, so a 5G line stays ahead of a
+     2-3x drag and the video, not the frames, is the picture */
+  return [portrait, portrait    ? "assets/video/hero-p1440c.mp4"
                   : need > 1900 ? "assets/video/hero-2560b.mp4"
                   : need > 1280 ? "assets/video/hero-1920b.mp4"
                                 : "assets/video/hero-1280b.mp4"];
