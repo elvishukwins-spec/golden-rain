@@ -3043,7 +3043,7 @@ function stripNext(){
   return stripCursor < stripOrder.length ? stripOrder[stripCursor] : -1;
 }
 function stripPump(){
-  while (stripInflight < 6) {
+  while (stripInflight < 8) {
     const j = stripNext();
     if (j < 0) {
       /* one retry pass for anything that failed, once the rest is in */
@@ -3103,6 +3103,15 @@ function stripWarm(idx, now){
   }
 }
 function stripArrived(j){
+  /* iPhones report nothing about the connection, so measure it: if the first
+     dozen frames (0.8 MB) took over two seconds, the line is under ~3 Mbps
+     and the rest of the strip comes every second frame -- six a second,
+     half the bytes -- rather than a picture that waits on the download */
+  if (strip.loaded === 12 && strip.every === 1 && performance.now() - strip.t0 > 2000) {
+    strip.every = 2;
+    stripOrder = stripOrder.filter(i => i % 2 === 0);
+    stripCursor = 0;
+  }
   /* the curtain: metadata is moot, and "buffered" is the first dozen frames
      of the coarse pass -- four seconds of film a third of a second apart */
   marks.meta = 1;
@@ -3128,6 +3137,7 @@ function stripStart(){
   const c = navigator.connection || {};
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType));
   strip.every = slow ? 2 : 1;               /* metered: every second frame, half the bytes */
+  strip.t0 = performance.now();
   const passes = slow ? [[4, 0], [4, 2]] : [[4, 0], [4, 2], [2, 1]];
   for (const [m, o] of passes) for (let i = o; i < STRIP_N; i += m) stripOrder.push(i);
   stripSize();
