@@ -3014,32 +3014,35 @@ let wasPortrait = null;
 /* ---- the phone film strip ----------------------------------------------
    On a portrait phone the opener is not a <video>. It is the portrait master
    as 469 frames, 24 a second, the centre 1000x2024 of the 1440-wide master
-   (a phone shows at most ~930 of those columns under object-fit: cover, so
-   the rest was decoded for nothing), drawn on a canvas from the scroll
-   position: frame = round(p * 468). That is the whole controller.
+   (a phone shows at most ~930 of those columns under object-fit: cover),
+   drawn on a canvas. The film PLAYS toward the scroll position -- the same
+   controller the desktop runs on the <video>, on frames, forward or backward,
+   up to 8x -- so the picture is always in motion at the film's own speed or
+   faster while there is anywhere to go, and eases to rest as the thumb does.
 
-   Why. The client's iPhone recording (15 Sep) was matched frame by frame
-   against the film: his thumb moved through the opener at up to four times
-   film speed, the film could play at three, so it trailed the finger by two
-   seconds of film and the section scrolled away with the sunrise never
-   shown. A video on a phone also has seeks, a buffer edge the page cannot
-   see past, and a play() that Low Power Mode refuses. A frame from an array
-   has none of that.
+   Why frames. The client's iPhone recording (15 Sep) was matched frame by
+   frame against the film: his thumb ran the opener at up to four times film
+   speed, the film could play at three, so it trailed the finger by two
+   seconds of film and the section scrolled away with the sunrise never shown.
+   A video on a phone also has seeks, a buffer edge the page cannot see past,
+   and a play() that Low Power Mode refuses. A frame from an array has none of
+   that.
 
-   Memory, because iOS kills a tab that takes too much: the compressed bytes
-   (35 MB) are held as blobs; an Image -- and so decoded pixels, 11.7 MB a
-   frame -- exists only for a window of frames around the reader, decoded
-   ahead in the direction of travel, and is released as it leaves the
-   window. Bounded by construction, on every engine. Frames arrive in four
-   passes (every 8th, 4th, 2nd, the rest) so the whole opener is scrubbable
-   after four megabytes; a slow line, measured from the first dozen frames,
-   stops at every second or fourth frame. */
-const STRIP_N = 469, STRIP_DIR = "../assets/video/strip-p-c/";
-const WIN_BACK = 3, WIN_AHEAD = 12;        /* live Images behind / ahead of the reader */
-/* state: 0 not asked, 1 fetching, 2 bytes here, 3 failed, 5 Image live, 4 Image decoded */
-const strip = { on: false, blobs: new Array(STRIP_N), imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N),
+   Memory, because iOS kills a tab that takes too much (Chrome on iOS showed
+   "Can't open this page" on a build that held sixteen decoded frames): frames
+   are plain images loaded from their URL, and at most NINE exist decoded at
+   once -- two behind the reader, six ahead in the direction of travel --
+   released as they leave that window; everything else is bytes in the HTTP
+   cache, warmed by a fetch loop in four passes (every 8th, 4th, 2nd, the
+   rest) so the whole opener is reachable after four megabytes. A slow line,
+   measured from the first dozen frames, stops at every second or fourth. */
+const STRIP_N = 469, STRIP_DIR = "../assets/video/strip-p-c/", STRIP_W = 1000;
+const WIN_BACK = 2, WIN_AHEAD = 7;         /* live decoded frames behind / ahead of the reader */
+/* state: 0 not asked, 1 fetching, 2 in the cache, 3 failed, 5 Image live, 4 Image decoded */
+const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N),
                 loaded: 0, idx: -1, drawn: -1, drawT: 0, deferred: false, dir: 1, speed: 0, cv: null, ctx: null,
-                every: 1, retried: false, t0: 0, live: [] };
+                every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false };
+const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
 let stripCursor = 0, stripInflight = 0, stripOrder = [];
 const stripAllowed = j => j >= 0 && j < STRIP_N && j % strip.every === 0;
 function stripNext(){
@@ -3052,91 +3055,108 @@ function stripNext(){
   while (stripCursor < stripOrder.length && strip.state[stripOrder[stripCursor]]) stripCursor++;
   return stripCursor < stripOrder.length ? stripOrder[stripCursor] : -1;
 }
+/* the warm loop: bytes into the HTTP cache, then forgotten */
 function stripPump(){
-  while (stripInflight < 8) {
+  while (stripInflight < 6) {
     const j = stripNext();
     if (j < 0) {
-      /* one retry pass for anything that failed, once the rest is in */
       if (!stripInflight && !strip.retried) { strip.retried = true; let n = 0; for (let i = 0; i < STRIP_N; i++) if (strip.state[i] === 3) { strip.state[i] = 0; n++; } stripCursor = 0; if (n) continue; }
       return;
     }
     strip.state[j] = 1; stripInflight++;
-    fetch(STRIP_DIR + String(j).padStart(3, "0") + ".webp")
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
-      .then(bl => { stripInflight--; strip.blobs[j] = bl; strip.state[j] = 2; strip.loaded++; stripArrived(j); stripPump(); })
-      .catch(() => { stripInflight--; strip.state[j] = 3; stripPump(); });
+    fetch(stripUrl(j)).then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(() => { stripInflight--; if (strip.state[j] === 1) strip.state[j] = 2; strip.loaded++; stripArrived(j); stripPump(); })
+      .catch(() => { stripInflight--; if (strip.state[j] === 1) strip.state[j] = 3; stripPump(); });
   }
 }
-/* Bring a frame to life: an Image over its blob, decoded off the main thread.
-   Nothing is drawn from a frame that has not been decoded unless there is no
-   decoded frame anywhere near. */
+/* bring a frame to life: an Image from the cache, decoded off the main thread */
 function stripLive(j){
   if (strip.state[j] !== 2) return;
   const im = new Image();
   im.decoding = "async";
-  const url = URL.createObjectURL(strip.blobs[j]);
-  im.__url = url;                                     /* revoked when the frame is released */
   im.onload = () => {
     if (strip.imgs[j] !== im) return;                 /* released while loading */
     if (Math.abs(j - strip.idx) <= 2) wake();         /* drawable now, decoded or not */
-    const p = im.decode ? im.decode() : Promise.resolve();
-    p.then(() => { if (strip.imgs[j] === im) { strip.state[j] = 4; if (Math.abs(j - strip.idx) <= 2) wake(); } })
-     .catch(() => {});
+    (im.decode ? im.decode() : Promise.resolve())
+      .then(() => { if (strip.imgs[j] === im) { strip.state[j] = 4; if (Math.abs(j - strip.idx) <= 2) wake(); } })
+      .catch(() => {});
   };
-  im.onerror = () => { if (strip.imgs[j] === im) { URL.revokeObjectURL(url); strip.imgs[j] = null; strip.state[j] = 2; } };
+  im.onerror = () => { if (strip.imgs[j] === im) { strip.imgs[j] = null; strip.state[j] = 2; } };
   strip.imgs[j] = im; strip.state[j] = 5;
   strip.live.push(j);
-  im.src = url;
+  im.src = stripUrl(j);
 }
 function stripRelease(j){
   if (strip.state[j] < 4) return;
   const im = strip.imgs[j];
-  if (im && im.__url) URL.revokeObjectURL(im.__url);
   strip.imgs[j] = null;                               /* the decoded pixels go with it */
   strip.state[j] = 2;
+  if (im) im.src = "";                                /* and Safari drops its decoded frame now, not at GC */
 }
-/* the window: live frames from WIN_BACK behind to WIN_AHEAD ahead, in the
-   direction of travel; everything else released */
-function stripWindow(idx){
-  const lo = strip.dir > 0 ? idx - WIN_BACK : idx - WIN_AHEAD;
-  const hi = strip.dir > 0 ? idx + WIN_AHEAD : idx + WIN_BACK;
+/* the window: at speed it strides -- at 192 frames a second the screen shows
+   every third frame at best, and decoding the ones between is wasted */
+function stripWindow(idx, dt){
+  /* Strides are powers of two, chosen from a SMOOTHED rate with hysteresis:
+     the raw rate wobbles with every uneven animation frame, and a stride that
+     flipped 1-2-4 with it released frames before they had finished loading
+     (measured: 17 pictures in three seconds at a steady 700 px/s, with
+     freezes over a second). Multiples of four are multiples of two, so a
+     change of stride keeps the frames already alive. */
+  strip.rateS += (strip.rate - strip.rateS) * Math.min(1, (dt || 1 / 60) * 6);
+  const r = strip.rateS, cur = strip.stride;
+  let st = cur;
+  /* a frame costs a load and a decode, about thirty a second on a phone; past
+     that the film shows every second frame at a steady cadence rather than
+     dropping frames at random */
+  if (r > 160) st = 8; else if (r > 80 && cur < 4) st = 4; else if (r > 30 && cur < 2) st = 2;
+  if (r < 96 && cur === 8) st = 4;
+  if (r < 48 && st === 4 && cur !== 8) st = 2;
+  if (r < 20) st = 1;
+  strip.stride = st;
+  const lo = strip.dir > 0 ? idx - WIN_BACK * st : idx - WIN_AHEAD * st;
+  const hi = strip.dir > 0 ? idx + WIN_AHEAD * st : idx + WIN_BACK * st;
   const keep = [];
-  for (const j of strip.live) { if (j < lo || j > hi) stripRelease(j); else keep.push(j); }
+  for (const j of strip.live) {
+    /* behind, or outside the window: release. Unaligned but already decoded
+       and still ahead: keep, it costs nothing until it is behind. Unaligned
+       and still loading: release, it would be skipped anyway. */
+    const out = j < lo || j > hi;
+    const misaligned = st > 1 && j % st !== 0 && j !== idx;
+    if (out || (misaligned && strip.state[j] !== 4)) stripRelease(j); else keep.push(j);
+  }
   strip.live = keep;
-  /* nearest first, so the frame under the thumb decodes before the ones ahead */
+  const base = st > 1 ? Math.round(idx / st) * st : idx;
   for (let k = 0; k <= WIN_AHEAD; k++) {
-    for (const j of [idx + k * strip.dir, idx - k * strip.dir]) {
+    for (const j of [base + k * st * strip.dir, base - k * st * strip.dir]) {
       if (j < lo || j > hi || j < 0 || j >= STRIP_N) continue;
-      if (strip.state[j] === 2) stripLive(j);
+      if (strip.state[j] === 2 && strip.live.length < WIN_BACK + WIN_AHEAD + 3) stripLive(j);
     }
   }
 }
-/* The frame to show for a target: the exact frame if decoded; else a decoded
-   neighbour within reach (two frames at a drag, up to twelve mid-fling, when
-   the eye cannot tell and a decode on the main thread would cost the frame);
-   else the exact frame even if it must decode now; else the nearest live
-   frame; else nothing (the poster shows). */
+/* The frame to show: the exact frame if decoded; else a decoded neighbour
+   within reach (two frames at a drag, more at speed, when the eye cannot
+   tell and a decode on the main thread would cost the frame); else the exact
+   frame even if it must decode now; else the nearest live frame; else
+   nothing (the poster shows). */
 function stripNearest(idx){
   const st = strip.state;
   if (st[idx] === 4) return idx;
-  const reach = Math.max(2, Math.min(12, strip.speed));
+  const reach = Math.max(2, Math.min(12, strip.speed), strip.stride * 2);
   for (let k = 1; k <= reach; k++) {
     if (idx - k >= 0 && st[idx - k] === 4) return idx - k;
     if (idx + k < STRIP_N && st[idx + k] === 4) return idx + k;
   }
-  if (st[idx] === 5 && strip.imgs[idx] && strip.imgs[idx].complete) return idx;
-  for (let k = 1; k < STRIP_N; k++) {
-    for (const j of [idx - k, idx + k])
-      if (j >= 0 && j < STRIP_N && (st[j] === 4 || (st[j] === 5 && strip.imgs[j] && strip.imgs[j].complete))) return j;
-  }
+  const ok = j => j >= 0 && j < STRIP_N && (st[j] === 4 || (st[j] === 5 && strip.imgs[j] && strip.imgs[j].complete && strip.imgs[j].naturalWidth));
+  if (ok(idx)) return idx;
+  for (let k = 1; k < STRIP_N; k++) { if (ok(idx - k)) return idx - k; if (ok(idx + k)) return idx + k; }
   return -1;
 }
 function stripSize(){
-  const cv = strip.cv, st = cv.parentNode;
-  const w = st.clientWidth || innerWidth, h = st.clientHeight || innerHeight;
-  let dpr = Math.min(devicePixelRatio || 1, 3);
-  /* a 3x phone is 3 Mpx: enough; cap the backing store there */
-  if (w * h * dpr * dpr > 3.6e6) dpr = Math.sqrt(3.6e6 / (w * h));
+  const cv = strip.cv, stg = cv.parentNode;
+  const w = stg.clientWidth || innerWidth, h = stg.clientHeight || innerHeight;
+  /* never wider than the strip itself: past that is upscaling into a bigger
+     backing store for no more detail (a 3x phone was 12 MB; this is 8) */
+  const dpr = Math.min(devicePixelRatio || 1, 3, STRIP_W / w);
   const cw = Math.round(w * dpr), ch = Math.round(h * dpr);
   if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; strip.drawn = -1; }
 }
@@ -3144,7 +3164,7 @@ function stripDraw(idx, now){
   const j = stripNearest(idx);
   strip.deferred = false;
   if (j < 0 || j === strip.drawn) return j;
-  /* mid-fling, a frame that is not decoded yet is drawn at most thirty times
+  /* at speed, a frame that is not decoded yet is drawn at most thirty times
      a second (Safari decodes it on the main thread as it draws) */
   if (strip.state[j] !== 4 && strip.speed > 2 && now - strip.drawT < 28) { strip.deferred = true; return strip.drawn; }
   const im = strip.imgs[j], cv = strip.cv, ctx = strip.ctx;
@@ -3159,7 +3179,7 @@ function stripDraw(idx, now){
 }
 function stripArrived(j){
   /* iPhones report nothing about the connection, so measure it: twelve
-     frames (~0.9 MB) timed from the first byte. Over 1.6 s is under ~4 Mbps
+     frames (~0.7 MB) timed from the first byte. Over 1.6 s is under ~4 Mbps
      and the rest of the strip comes every second frame; over 3.2 s, every
      fourth. */
   if (strip.loaded === 1) strip.t0 = performance.now();
@@ -3173,7 +3193,7 @@ function stripArrived(j){
   marks.buffer = Math.max(marks.buffer, Math.min(1, strip.loaded / 8));
   bootTick();
   if (!opened && strip.loaded >= 4 && strip.state[0] >= 2) openHero();
-  if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD) { stripWindow(Math.max(0, strip.idx)); wake(); }
+  if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD * strip.stride) { stripWindow(Math.max(0, strip.idx)); wake(); }
 }
 function stripStart(){
   strip.on = true;
@@ -3192,8 +3212,6 @@ function stripStart(){
   const c = navigator.connection || {};
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType));
   strip.every = slow ? 2 : 1;               /* metered: every second frame, half the bytes */
-  /* every eighth frame first (a third of a second apart across the whole
-     opener, 4 MB), then the frames between, twice, then the rest */
   const passes = slow ? [[8, 0], [8, 4], [4, 2]] : [[8, 0], [8, 4], [4, 2], [2, 1]];
   for (const [m, o] of passes) for (let i = o; i < STRIP_N; i += m) stripOrder.push(i);
   stripSize();
@@ -3594,11 +3612,32 @@ function tick(now){
   if (Math.abs(d) < 0.0002) smoothP = targetP;
 
   if (strip.on) {
-    /* the frame IS the scroll position; the only wait is for bytes */
-    const idx = Math.round(smoothP * (STRIP_N - 1));
+    /* The film PLAYS toward the scroll position rather than sitting on it.
+       Scrubbed straight off the thumb, every wobble of the finger was a
+       wobble of the picture and the film stopped dead the moment the touch
+       did -- "not like one video". This is the desktop's controller on
+       frames: the rate is set by the distance to the target (never under
+       the film's own 24 a second while there is anywhere to go, up to 8x),
+       so the picture is always in motion at film speed or faster and eases
+       to rest as the gap closes. Backwards too, which a video cannot do. A
+       gap past sixty frames is cut to sixty and chased from there; leaving
+       the opener lands on the last frame. */
+    const T = smoothP * (STRIP_N - 1);
+    if (strip.pos < 0) strip.pos = T;
+    let gap = T - strip.pos;
+    if (Math.abs(gap) > 60) { strip.pos = T - Math.sign(gap) * 60; gap = T - strip.pos; }
+    if (smoothP >= 0.995 && gap > 0) { strip.pos = T; gap = 0; }
+    let rate = 0;
+    if (Math.abs(gap) >= 0.5) {
+      rate = Math.min(192, Math.max(24, Math.abs(gap) * 8));      /* frames per second */
+      strip.pos += Math.sign(gap) * Math.min(rate * dt, Math.abs(gap));
+    } else strip.pos = T;
+    strip.rate = rate;
+    strip.chasing = Math.abs(T - strip.pos) >= 0.5;
+    const idx = Math.round(strip.pos);
     strip.speed = strip.idx < 0 ? 0 : Math.abs(idx - strip.idx);   /* frames per tick */
     if (idx !== strip.idx) { if (strip.idx >= 0) strip.dir = idx > strip.idx ? 1 : -1; strip.idx = idx; }
-    stripWindow(idx);
+    stripWindow(idx, dt);
     const j = stripDraw(idx, now);
     const starving = j < 0 || Math.abs(j - idx) > 8;   /* a third of a second away */
     if (load) {
@@ -3682,7 +3721,7 @@ function tick(now){
   const routesLive = false;
   /* while the film is still chasing the target, the loop has to stay up to
      stop it when it arrives */
-  if (smoothP === targetP && !seeking && !chasing && !routesLive && !strip.deferred) { rafId = 0; return; }
+  if (smoothP === targetP && !seeking && !chasing && !routesLive && !strip.deferred && !strip.chasing) { rafId = 0; return; }
   rafId = requestAnimationFrame(tick);
 }
 /* Restarting a parked loop must not count the idle gap as elapsed frame time,
