@@ -324,7 +324,7 @@ html[dir="rtl"] .boot-line i{transform-origin:right center}
   pointer-events:none}
 /* phones: the film is drawn here, frame by frame, from the scroll position */
 .d-strip{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:block;
-  pointer-events:none;background:transparent;opacity:0}
+  pointer-events:none;background:transparent;opacity:0;transition:opacity .12s linear}
 .d-strip.is-on{opacity:1}
 .d-vig{position:absolute;inset:0;pointer-events:none;z-index:3;
   background:radial-gradient(ellipse at 60% 48%,transparent 34%,rgba(var(--bgc),.5) 72%,rgba(var(--bgc),.9) 100%)}
@@ -3046,8 +3046,8 @@ const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP
                 cap: 30, lat: 0, rev: 0,
                 /* the hybrid: "video" while the <video> is the picture, "strip" while the frames are */
                 hybrid: false, mode: "strip", modeT: 0, returning: false, shown: false };
-const LEASH_V = 0.8;      /* seconds the video may fall behind before the frames take over */
-const RETURN_V = 0.35;    /* and how close the frames must be to the target before the video comes back */
+const LEASH_V = 1.2;      /* seconds the video may fall behind before the frames take over */
+const RETURN_V = 0.4;     /* and how close the frames must be to the target before the video comes back */
 const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
 let stripCursor = 0, stripInflight = 0, stripOrder = [];
 const stripAllowed = j => j >= 0 && j < STRIP_N && j % strip.every === 0;
@@ -3311,7 +3311,7 @@ function bufferedAhead(){
   return e;
 }
 function probe(){
-  if ((strip.on && !strip.hybrid) || probed || light || !hero.duration || !isFinite(hero.duration)) return;
+  if (strip.on || probed || light || !hero.duration || !isFinite(hero.duration)) return;
   const el = (performance.now() - probeT0) / 1000;
   if (el < 1.5) return;
   probed = true;
@@ -3382,7 +3382,10 @@ function chooseUrl(){
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType)) || (c.downlink && c.downlink < 6);
   /* the "b" files are the 14 Sep re-join (the passage through the cut); new
      names because the old ones sit in edge caches for thirty days */
-  if (slow || light) return [portrait, lightUrl(portrait)];
+  /* On a phone the frames cover a slow line (the video hands over when its
+     bytes are not there), so the video stays the sharp file: a handover
+     between a soft video and sharp frames would itself read as a cut. */
+  if ((slow || light) && !(strip.on && strip.hybrid)) return [portrait, lightUrl(portrait)];
   return [portrait, portrait    ? "../assets/video/hero-p1440b.mp4"
                   : need > 1900 ? "../assets/video/hero-2560b.mp4"
                   : need > 1280 ? "../assets/video/hero-1920b.mp4"
@@ -3749,7 +3752,7 @@ function tick(now){
     if (strip.hybrid && !noPlay && dur > 0 && !strip.returning && !seeking && strip.dir > 0 && now - strip.modeT > 500) {
       const gapS = (T - strip.pos) / 24;
       const tv = strip.pos / 24;
-      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 0.5) {
+      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 1.5) {   /* and a second and a half of film in hand */
         strip.returning = true; strip.reseek = false;
         if (Math.abs(hero.currentTime - tv) < 0.03) stripVideoBack(now);   /* already there: a seek would fire no event */
         else {
