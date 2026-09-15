@@ -3368,7 +3368,7 @@ hero.addEventListener("seeked", () => {
    and nothing is on screen yet. Forward scrolling PLAYS the film now, so the
    longer GOP costs only on backward seeks. */
 let light = false;
-const lightUrl = p => p ? "assets/video/hero-p864g.mp4" : "assets/video/hero-1280g.mp4";
+const lightUrl = p => p ? "assets/video/hero-p864g.mp4" : "assets/video/hero-1280h.mp4";
 const probeT0 = performance.now();
 let probed = false;
 /* the end of the buffered range the film is currently inside, or -1 */
@@ -3465,9 +3465,9 @@ function chooseUrl(){
      cut at 1:1 and 11 Mbps instead of 15.5, so a 5G line stays ahead of a
      2-3x drag and the video, not the frames, is the picture */
   return [portrait, portrait    ? "assets/video/hero-p1440d.mp4"
-                  : need > 1900 ? "assets/video/hero-2560b.mp4"
-                  : need > 1280 ? "assets/video/hero-1920b.mp4"
-                                : "assets/video/hero-1280b.mp4"];
+                  : need > 1900 ? "assets/video/hero-2560c.mp4"
+                  : need > 1280 ? "assets/video/hero-1920c.mp4"
+                                : "assets/video/hero-1280c.mp4"];
 }
 
 
