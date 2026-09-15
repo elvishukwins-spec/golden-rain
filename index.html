@@ -3783,7 +3783,7 @@ function tick(now){
     if (strip.hybrid && !noPlay && dur > 0 && !strip.returning && !seeking && strip.dir > 0 && now - strip.modeT > 500) {
       const gapS = (T - strip.pos) / 24;
       const tv = strip.pos / 24;
-      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 1.5) {   /* and a second and a half of film in hand */
+      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 3) {   /* and three seconds of film in hand, so it stays */
         strip.returning = true; strip.reseek = false;
         if (Math.abs(hero.currentTime - tv) < 0.03) stripVideoBack(now);   /* already there: a seek would fire no event */
         else {
