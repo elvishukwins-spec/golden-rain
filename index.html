@@ -325,7 +325,8 @@ html[dir="rtl"] .boot-line i{transform-origin:right center}
   pointer-events:none}
 /* phones: the film is drawn here, frame by frame, from the scroll position */
 .d-strip{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:block;
-  pointer-events:none;background:transparent}
+  pointer-events:none;background:transparent;opacity:0}
+.d-strip.is-on{opacity:1}
 .d-vig{position:absolute;inset:0;pointer-events:none;z-index:3;
   background:radial-gradient(ellipse at 60% 48%,transparent 34%,rgba(var(--bgc),.5) 72%,rgba(var(--bgc),.9) 100%)}
 /* The punch-through. This must be FULLY OPAQUE at peak — a gradient that fades
@@ -3073,7 +3074,11 @@ const WIN_BACK = 2, WIN_AHEAD = 7;         /* live decoded frames behind / ahead
 const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N), seen: new Uint8Array(STRIP_N),
                 loaded: 0, idx: -1, drawn: -1, drawT: 0, deferred: false, dir: 1, speed: 0, cv: null, ctx: null,
                 every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false,
-                cap: 30, lat: 0, rev: 0 };
+                cap: 30, lat: 0, rev: 0,
+                /* the hybrid: "video" while the <video> is the picture, "strip" while the frames are */
+                hybrid: false, mode: "strip", modeT: 0, returning: false, shown: false };
+const LEASH_V = 0.8;      /* seconds the video may fall behind before the frames take over */
+const RETURN_V = 0.35;    /* and how close the frames must be to the target before the video comes back */
 const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
 let stripCursor = 0, stripInflight = 0, stripOrder = [];
 const stripAllowed = j => j >= 0 && j < STRIP_N && j % strip.every === 0;
@@ -3231,6 +3236,7 @@ function stripDraw(idx, now){
   const sc = Math.max(cw / iw, ch / ih), sw = cw / sc, sh = ch / sc;
   try { ctx.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, cw, ch); } catch(e){ return strip.drawn; }
   strip.drawn = j; strip.drawT = now;
+  if (!strip.shown) { strip.shown = true; cv.classList.add("is-on"); }
   return j;
 }
 function stripArrived(j){
@@ -3260,20 +3266,53 @@ function stripStart(){
   hero.insertAdjacentElement("afterend", cv);
   strip.cv = cv;
   strip.ctx = cv.getContext("2d");   /* transparent until the first frame, so the poster shows through */
-  /* the video element stays for its poster, and never loads a film */
-  hero.removeAttribute("preload"); hero.preload = "none";
+  /* The video is the picture whenever it can keep up: hardware-decoded,
+     the film's own motion, exactly the desktop. The frames are for what a
+     video cannot do on a phone. So the film loads as on any device, and the
+     strip warms only its coarse passes (every 8th and 4th frame, 7 MB): at a
+     flick the frames shown are every 8th anyway, and the ones between are
+     fetched as the window needs them. */
+  strip.hybrid = !reduced;
   document.getElementById("descent").classList.add("band");
   FRAME.x0 = 576; FRAME.w = 768; FRAME.ar = 768 / 1080; FRAME.posY = 0.5; FRAME.clamp = 0.07; FRAME.compact = true; FRAME.originLabels = true;
-  wasPortrait = true;
   const c = navigator.connection || {};
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType));
   strip.every = slow ? 2 : 1;               /* metered: every second frame, half the bytes */
-  const passes = slow ? [[8, 0], [8, 4], [4, 2]] : [[8, 0], [8, 4], [4, 2], [2, 1]];
+  const passes = strip.hybrid ? [[8, 0], [8, 4]] : slow ? [[8, 0], [8, 4], [4, 2]] : [[8, 0], [8, 4], [4, 2], [2, 1]];
   for (const [m, o] of passes) for (let i = o; i < STRIP_N; i += m) stripOrder.push(i);
   stripSize();
   addEventListener("resize", () => { if (strip.on) { stripSize(); wake(); } });
   stripPump();
+  if (strip.hybrid) { strip.mode = "video"; pickSource(); }
 }
+/* the video is back: from a seek that has landed to its first presented frame */
+function stripVideoBack(now){
+  const done = () => {
+    if (!strip.returning) return;
+    strip.returning = false;
+    strip.mode = "video"; strip.modeT = performance.now();
+    strip.cv.classList.remove("is-on"); strip.shown = false;
+    for (const j of strip.live) stripRelease(j);
+    strip.live = [];
+    wake();
+  };
+  const gap = smoothP * (dur - 0.05) - hero.currentTime;
+  const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
+  try { hero.playbackRate = rate; } catch(e){}
+  chasing = true;
+  const p = hero.play();
+  if (p && p.catch) p.catch(err => { chasing = false; strip.returning = false; if (!err || err.name !== "AbortError") noPlay = true; wake(); });
+  if (hero.requestVideoFrameCallback) hero.requestVideoFrameCallback(done);
+  else setTimeout(done, 60);
+}
+hero.addEventListener("seeked", () => {
+  if (!strip.returning) return;
+  /* the frames kept moving while the seek was in flight; if they are now
+     more than a quarter second past where the video landed, seek once more */
+  const drift = strip.pos - hero.currentTime * 24;
+  if (drift > 6 && !strip.reseek) { strip.reseek = true; seeking = true; seekStart = performance.now(); try { hero.currentTime = strip.pos / 24; } catch(e){ seeking = false; strip.returning = false; } return; }
+  stripVideoBack(performance.now());
+});
 /* ---- the connection decides the file ----------------------------------
    The film is 20-52 MB. On a connection that cannot fetch it faster than the
    reader scrolls through it, every scroll step lands past the buffered edge
@@ -3303,7 +3342,7 @@ function bufferedAhead(){
   return e;
 }
 function probe(){
-  if (strip.on || probed || light || !hero.duration || !isFinite(hero.duration)) return;
+  if ((strip.on && !strip.hybrid) || probed || light || !hero.duration || !isFinite(hero.duration)) return;
   const el = (performance.now() - probeT0) / 1000;
   if (el < 1.5) return;
   probed = true;
@@ -3330,7 +3369,7 @@ setTimeout(probe, 1600);
    browser's own range-request pipeline handles it, and wake the decoder with
    one muted play/pause. */
 function prime(){
-  if (strip.on) return;
+  if (strip.on && !strip.hybrid) return;
   try {
     const pr = hero.play();
     if (pr && pr.then) pr.then(() => hero.pause()).catch(() => {});
@@ -3383,7 +3422,7 @@ function chooseUrl(){
 
 
 function pickSource(){
-  if (strip.on) return;
+  if (strip.on && !strip.hybrid) return;
   const [portrait, url] = chooseUrl();
   document.getElementById("descent").classList.toggle("band", portrait);
   if (portrait) { FRAME.x0 = 576; FRAME.w = 768;  FRAME.ar = 768 / 1080; FRAME.posY = 0.5;  FRAME.clamp = 0.07; FRAME.compact = true;  FRAME.originLabels = true;  }
@@ -3592,7 +3631,7 @@ function bufferedFrac(){
 }
 function tickLoad(){
   if (opened) return;
-  const f = strip.on ? strip.loaded / STRIP_N : bufferedFrac();
+  const f = strip.on && !strip.hybrid ? strip.loaded / STRIP_N : bufferedFrac();
   fill.style.transform = "scaleX(" + Math.max(.06, f) + ")";
   ltxt.textContent = f > 0.02 ? "Loading film · " + Math.round(f * 100) + "%"
                               : "Loading film";
@@ -3667,7 +3706,34 @@ function tick(now){
   smoothP += d * (1 - Math.pow(1 - (strip.on ? 0.4 : EASE_K), dt * 60));
   if (Math.abs(d) < 0.0002) smoothP = targetP;
 
-  if (strip.on) {
+  /* ---- hybrid, video mode: the desktop's chase, and the two exits ------ */
+  if (strip.on && strip.mode === "video") {
+    const useVideo = strip.hybrid && !noPlay && dur > 0;
+    let T = smoothP * (dur - 0.05);
+    const edge = useVideo ? bufferedEdge(hero.currentTime) : -1;
+    const starving = edge >= 0 && T > edge - 0.05 && T > hero.currentTime;
+    const gap = T - hero.currentTime;
+    /* to the frames: nothing to play, the film has fallen too far behind a
+       flick, the reader is going backwards, or the bytes have not arrived */
+    if (!useVideo || gap > LEASH_V || gap < -0.06 || starving || seeking) {
+      if (chasing || !hero.paused) { hero.pause(); chasing = false; try { hero.playbackRate = 1; } catch(e){} }
+      strip.pos = Math.max(0, Math.min(STRIP_N - 1, hero.currentTime * 24));
+      strip.idx = Math.round(strip.pos); strip.drawn = -1;
+      strip.mode = "strip"; strip.modeT = now; strip.returning = false; strip.reseek = false; strip.shown = false;
+      if (load) load.classList.add("gone");
+    } else {
+      if (load) load.classList.add("gone");
+      if (gap > 1.5 / FPS) {
+        const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
+        if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
+        if (hero.paused) {
+          chasing = true;
+          hero.play().catch(err => { chasing = false; if (!err || err.name !== "AbortError") { noPlay = true; wake(); } });
+        }
+      } else if (chasing || !hero.paused) { hero.pause(); chasing = false; try { hero.playbackRate = 1; } catch(e){} }
+    }
+  }
+  if (strip.on && strip.mode === "strip") {
     /* The film PLAYS toward the scroll position rather than sitting on it.
        Scrubbed straight off the thumb, every wobble of the finger was a
        wobble of the picture and the film stopped dead the moment the touch
@@ -3706,6 +3772,24 @@ function tick(now){
     if (load) {
       load.classList.toggle("gone", !starving);
       if (starving && ltxt) { const f = strip.loaded / STRIP_N; ltxt.textContent = "Loading the film · " + Math.round(f * 100) + "%"; fill.style.transform = "scaleX(" + f.toFixed(3) + ")"; }
+    }
+    /* back to the video: going forward, the frames within a third of a
+       second of the target, the film buffered there, and a moment settled
+       in this mode. The seek is issued now; the frames keep drawing until
+       the video has actually presented its first frame after it. */
+    if (strip.hybrid && !noPlay && dur > 0 && !strip.returning && !seeking && strip.dir > 0 && now - strip.modeT > 500) {
+      const gapS = (T - strip.pos) / 24;
+      const tv = strip.pos / 24;
+      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 0.5) {
+        strip.returning = true; strip.reseek = false;
+        if (Math.abs(hero.currentTime - tv) < 0.03) stripVideoBack(now);   /* already there: a seek would fire no event */
+        else {
+          seeking = true; seekStart = now;
+          try { hero.currentTime = tv; } catch(e){ seeking = false; strip.returning = false; }
+          clearTimeout(seekGuard);
+          seekGuard = setTimeout(() => { seeking = false; strip.returning = false; strip.modeT = performance.now(); wake(); }, Math.min(900, Math.max(300, seekAvg * 3)));
+        }
+      }
     }
   }
 
@@ -3784,7 +3868,7 @@ function tick(now){
   const routesLive = false;
   /* while the film is still chasing the target, the loop has to stay up to
      stop it when it arrives */
-  if (smoothP === targetP && !seeking && !chasing && !routesLive && !strip.deferred && !strip.chasing) { rafId = 0; return; }
+  if (smoothP === targetP && !seeking && !chasing && !routesLive && !strip.deferred && !strip.chasing && !strip.returning) { rafId = 0; return; }
   rafId = requestAnimationFrame(tick);
 }
 /* Restarting a parked loop must not count the idle gap as elapsed frame time,
