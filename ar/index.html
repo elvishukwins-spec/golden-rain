@@ -3039,7 +3039,7 @@ let wasPortrait = null;
 const STRIP_N = 469, STRIP_DIR = "../assets/video/strip-p-c/", STRIP_W = 1000;
 const WIN_BACK = 2, WIN_AHEAD = 7;         /* live decoded frames behind / ahead of the reader */
 /* state: 0 not asked, 1 fetching, 2 in the cache, 3 failed, 5 Image live, 4 Image decoded */
-const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N),
+const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N), seen: new Uint8Array(STRIP_N),
                 loaded: 0, idx: -1, drawn: -1, drawT: 0, deferred: false, dir: 1, speed: 0, cv: null, ctx: null,
                 every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false };
 const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
@@ -3050,9 +3050,9 @@ function stripNext(){
   /* what the reader is looking at first, in the direction they are going */
   for (let k = 0; k <= 24; k++) {
     for (const j of [c + k * strip.dir, c - k * strip.dir])
-      if (stripAllowed(j) && !strip.state[j]) return j;
+      if (stripAllowed(j) && !strip.state[j] && !strip.seen[j]) return j;
   }
-  while (stripCursor < stripOrder.length && strip.state[stripOrder[stripCursor]]) stripCursor++;
+  while (stripCursor < stripOrder.length && (strip.state[stripOrder[stripCursor]] || strip.seen[stripOrder[stripCursor]])) stripCursor++;
   return stripCursor < stripOrder.length ? stripOrder[stripCursor] : -1;
 }
 /* the warm loop: bytes into the HTTP cache, then forgotten */
@@ -3065,23 +3065,27 @@ function stripPump(){
     }
     strip.state[j] = 1; stripInflight++;
     fetch(stripUrl(j)).then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then(() => { stripInflight--; if (strip.state[j] === 1) strip.state[j] = 2; strip.loaded++; stripArrived(j); stripPump(); })
+      .then(() => { stripInflight--; if (strip.state[j] === 1) strip.state[j] = 2; if (!strip.seen[j]) { strip.seen[j] = 1; strip.loaded++; stripArrived(j); } stripPump(); })
       .catch(() => { stripInflight--; if (strip.state[j] === 1) strip.state[j] = 3; stripPump(); });
   }
 }
-/* bring a frame to life: an Image from the cache, decoded off the main thread */
+/* Bring a frame to life: an Image, from the cache if the warm loop has been
+   past it and straight from the network if not (the warm loop is only an
+   optimisation; the picture must never wait on it), decoded off the main
+   thread. */
 function stripLive(j){
-  if (strip.state[j] !== 2) return;
+  if (strip.state[j] >= 4) return;
   const im = new Image();
   im.decoding = "async";
   im.onload = () => {
     if (strip.imgs[j] !== im) return;                 /* released while loading */
+    if (!strip.seen[j]) { strip.seen[j] = 1; if (strip.state[j] !== 2) { strip.loaded++; stripArrived(j); } }
     if (Math.abs(j - strip.idx) <= 2) wake();         /* drawable now, decoded or not */
     (im.decode ? im.decode() : Promise.resolve())
       .then(() => { if (strip.imgs[j] === im) { strip.state[j] = 4; if (Math.abs(j - strip.idx) <= 2) wake(); } })
       .catch(() => {});
   };
-  im.onerror = () => { if (strip.imgs[j] === im) { strip.imgs[j] = null; strip.state[j] = 2; } };
+  im.onerror = () => { if (strip.imgs[j] === im) { strip.imgs[j] = null; strip.state[j] = 3; } };
   strip.imgs[j] = im; strip.state[j] = 5;
   strip.live.push(j);
   im.src = stripUrl(j);
@@ -3102,7 +3106,7 @@ function stripWindow(idx, dt){
      (measured: 17 pictures in three seconds at a steady 700 px/s, with
      freezes over a second). Multiples of four are multiples of two, so a
      change of stride keeps the frames already alive. */
-  strip.rateS += (strip.rate - strip.rateS) * Math.min(1, (dt || 1 / 60) * 6);
+  strip.rateS = strip.rate ? strip.rateS + (strip.rate - strip.rateS) * Math.min(1, (dt || 1 / 60) * 6) : 0;
   const r = strip.rateS, cur = strip.stride;
   let st = cur;
   /* a frame costs a load and a decode, about thirty a second on a phone; past
@@ -3129,7 +3133,7 @@ function stripWindow(idx, dt){
   for (let k = 0; k <= WIN_AHEAD; k++) {
     for (const j of [base + k * st * strip.dir, base - k * st * strip.dir]) {
       if (j < lo || j > hi || j < 0 || j >= STRIP_N) continue;
-      if (strip.state[j] === 2 && strip.live.length < WIN_BACK + WIN_AHEAD + 3) stripLive(j);
+      if (strip.state[j] < 4 && strip.live.length < WIN_BACK + WIN_AHEAD + 3) stripLive(j);
     }
   }
 }
@@ -3192,7 +3196,7 @@ function stripArrived(j){
   marks.meta = 1;
   marks.buffer = Math.max(marks.buffer, Math.min(1, strip.loaded / 8));
   bootTick();
-  if (!opened && strip.loaded >= 4 && strip.state[0] >= 2) openHero();
+  if (!opened && strip.loaded >= 4 && (strip.state[0] >= 2 || strip.seen[0])) openHero();
   if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD * strip.stride) { stripWindow(Math.max(0, strip.idx)); wake(); }
 }
 function stripStart(){
@@ -3632,8 +3636,8 @@ function tick(now){
       rate = Math.min(192, Math.max(24, Math.abs(gap) * 8));      /* frames per second */
       strip.pos += Math.sign(gap) * Math.min(rate * dt, Math.abs(gap));
     } else strip.pos = T;
-    strip.rate = rate;
     strip.chasing = Math.abs(T - strip.pos) >= 0.5;
+    strip.rate = strip.chasing ? rate : 0;            /* arrived: at rest, stride one, the exact frame */
     const idx = Math.round(strip.pos);
     strip.speed = strip.idx < 0 ? 0 : Math.abs(idx - strip.idx);   /* frames per tick */
     if (idx !== strip.idx) { if (strip.idx >= 0) strip.dir = idx > strip.idx ? 1 : -1; strip.idx = idx; }
