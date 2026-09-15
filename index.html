@@ -61,7 +61,7 @@
   "description": "Wholesale supplier of fresh fruit and vegetables to supermarkets, restaurants, caterers, hotels and institutions across the Sultanate of Oman, trading from inside Silal Central Market in Barka.",
   "slogan": "Your partner in fresh supply",
   "telephone": "+96899320963",
-  "email": "goldenrainmarket@gmail.com",
+  "email": "goldenrain.silal@gmail.com",
   "currenciesAccepted": "OMR",
   "address": {
     "@type": "PostalAddress",
@@ -91,7 +91,7 @@
     "@type": "ContactPoint",
     "contactType": "sales",
     "telephone": "+96899320963",
-    "email": "goldenrainmarket@gmail.com",
+    "email": "goldenrain.silal@gmail.com",
     "url": "https://wa.me/96899320963",
     "availableLanguage": ["en", "ar"],
     "areaServed": "OM"
@@ -2405,7 +2405,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
         <div class="lbl">Call</div>
         <a href="tel:+96899320963">+968 9932 0963</a>
         <div class="lbl" style="margin-top:26px">Email</div>
-        <a href="mailto:goldenrainmarket@gmail.com">goldenrainmarket@gmail.com</a>
+        <a href="mailto:goldenrain.silal@gmail.com">goldenrain.silal@gmail.com</a>
         <div class="lbl" style="margin-top:26px">WhatsApp</div>
         <a class="wa wa-lg" href="https://wa.me/96899320963?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%2C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D9%88%D8%B1%D9%8A%D8%AF" target="_blank" rel="noopener" aria-label="Message Golden Rain on WhatsApp"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.02 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.29Z"/></svg><span>WhatsApp</span></a>
         <div class="lbl" style="margin-top:26px">Hours</div>
@@ -2444,7 +2444,7 @@ html[dir="rtl"] .aisle-prog i{transform-origin:right center;
          what we can hold and when it lands.</p>
       <a class="cta-big" href="https://wa.me/96899320963?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%2C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D9%88%D8%B1%D9%8A%D8%AF"
          target="_blank" rel="noopener">Start on WhatsApp</a>
-      <a class="cta-alt" href="mailto:goldenrainmarket@gmail.com?subject=Supply%20enquiry">Or email us</a>
+      <a class="cta-alt" href="mailto:goldenrain.silal@gmail.com?subject=Supply%20enquiry">Or email us</a>
     </div>
 
     <footer>
@@ -3058,15 +3058,19 @@ let wasPortrait = null;
    (every fourth frame, then every second, then the rest) so the whole
    opener is scrubbable a third of a second apart after a quarter of the
    download; a frame that has not arrived shows the nearest one that has. */
-const STRIP_N = 235, STRIP_DIR = "assets/video/strip-p-a/";
+/* strip-p-b: 24 fps, 1440x2024 (the portrait master's own size), the 27
+   frames of grey passage thinned to 9 so that stretch is a third of the
+   scroll it was. 451 frames, ~35 MB on a fast line; a slow line is measured
+   and takes every second or fourth frame. */
+const STRIP_N = 451, STRIP_DIR = "assets/video/strip-p-b/";
 const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N), warmT: new Float64Array(STRIP_N),
-                loaded: 0, idx: -1, drawn: -1, dir: 1, cv: null, ctx: null, every: 1, retried: false };
+                loaded: 0, idx: -1, drawn: -1, drawT: 0, deferred: false, dir: 1, speed: 0, cv: null, ctx: null, every: 1, retried: false };
 let stripCursor = 0, stripInflight = 0, stripOrder = [];
 const stripAllowed = j => j >= 0 && j < STRIP_N && j % strip.every === 0;
 function stripNext(){
   const c = strip.idx < 0 ? 0 : strip.idx;
   /* what the reader is looking at first, in the direction they are going */
-  for (let k = 0; k <= 12; k++) {
+  for (let k = 0; k <= 24; k++) {
     for (const j of [c + k * strip.dir, c - k * strip.dir])
       if (stripAllowed(j) && !strip.state[j]) return j;
   }
@@ -3089,13 +3093,29 @@ function stripPump(){
     im.src = STRIP_DIR + String(j).padStart(3, "0") + ".webp";
   }
 }
-/* the frame to show for a target: itself, else the nearest that has arrived,
-   the one behind preferred (the film holds at its edge, as the video did) */
+/* The frame to show for a target. A frame that has been DECODED (state 4)
+   draws in a millisecond; one that has only arrived (state 2) decodes on the
+   main thread first, 15-25 ms for 2.9 megapixels, which mid-fling is a
+   dropped frame. So: the exact frame if decoded; else a decoded neighbour
+   within two frames (a twelfth of a second, invisible); else the exact frame
+   even if it must decode now; else the nearest that has arrived, the one
+   behind preferred (the film holds at its edge, as the video did). */
 function stripNearest(idx){
-  if (strip.state[idx] === 2) return idx;
+  const st = strip.state;
+  if (st[idx] === 4) return idx;
+  /* how far a decoded stand-in may be: two frames at a drag, up to twelve (half
+     a second) mid-fling, when the eye cannot tell and a decode on the main
+     thread would cost the frame. Measured: 15 long frames in a 1.5 s fling
+     with a fixed two, none with this. */
+  const reach = Math.max(2, Math.min(12, strip.speed));
+  for (let k = 1; k <= reach; k++) {
+    if (idx - k >= 0 && st[idx - k] === 4) return idx - k;
+    if (idx + k < STRIP_N && st[idx + k] === 4) return idx + k;
+  }
+  if (st[idx] === 2) return idx;
   for (let k = 1; k < STRIP_N; k++) {
-    if (idx - k >= 0 && strip.state[idx - k] === 2) return idx - k;
-    if (idx + k < STRIP_N && strip.state[idx + k] === 2) return idx + k;
+    if (idx - k >= 0 && st[idx - k] >= 2 && st[idx - k] !== 3) return idx - k;
+    if (idx + k < STRIP_N && st[idx + k] >= 2 && st[idx + k] !== 3) return idx + k;
   }
   return -1;
 }
@@ -3108,29 +3128,40 @@ function stripSize(){
   const cw = Math.round(w * dpr), ch = Math.round(h * dpr);
   if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; strip.drawn = -1; }
 }
-function stripDraw(idx){
+function stripDraw(idx, now){
   const j = stripNearest(idx);
+  strip.deferred = false;
   if (j < 0 || j === strip.drawn) return j;
+  /* Mid-fling, a frame that is not decoded yet is drawn at most thirty times
+     a second (Safari decodes it on the main thread as it draws, and two of
+     those in one 16 ms frame is a dropped frame). The picture waits one tick;
+     the loop is kept awake to draw it. At a drag the exact frame always
+     draws. */
+  if (strip.state[j] !== 4 && strip.speed > 2 && now - strip.drawT < 28) { strip.deferred = true; return strip.drawn; }
   const im = strip.imgs[j], cv = strip.cv, ctx = strip.ctx;
   const cw = cv.width, ch = cv.height, iw = im.naturalWidth, ih = im.naturalHeight;
   if (!iw || !ih) return strip.drawn;
   /* object-fit: cover, centred -- the same crop the portrait video had */
   const sc = Math.max(cw / iw, ch / ih), sw = cw / sc, sh = ch / sc;
   try { ctx.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, cw, ch); } catch(e){ return strip.drawn; }
-  strip.drawn = j;
+  strip.drawn = j; strip.drawT = now;
   return j;
 }
-/* decode the frames just ahead off the main thread, so a draw never waits
-   on a decode. Safari may drop decoded pixels under memory pressure, so a
-   frame is asked for again after a few seconds rather than once ever. */
+/* Decode the frames just ahead off the main thread, so a draw never waits
+   on a decode: two frames behind, twenty ahead in the direction of travel.
+   Safari may drop decoded pixels under memory pressure, so a frame goes back
+   to "arrived" after a few seconds and is asked for again when it is near. */
 function stripWarm(idx, now){
-  for (let k = -2; k <= 10; k++) {
+  for (let k = -2; k <= 20; k++) {
     const j = idx + k * strip.dir;
-    if (j < 0 || j >= STRIP_N || strip.state[j] !== 2) continue;
+    if (j < 0 || j >= STRIP_N) continue;
+    const st = strip.state[j];
+    if (st === 4 && now - strip.warmT[j] > 6000) strip.state[j] = 2;
+    if (strip.state[j] !== 2) continue;
     const im = strip.imgs[j];
-    if (!im.decode || now - strip.warmT[j] < 4000) continue;
+    if (!im.decode || now - strip.warmT[j] < 1500) continue;
     strip.warmT[j] = now;
-    im.decode().catch(() => {});
+    im.decode().then(() => { if (strip.state[j] === 2) { strip.state[j] = 4; strip.warmT[j] = performance.now(); if (Math.abs(j - strip.idx) <= 2) wake(); } }).catch(() => {});
   }
 }
 function stripArrived(j){
@@ -3138,10 +3169,10 @@ function stripArrived(j){
      dozen frames (0.8 MB) took over two seconds, the line is under ~3 Mbps
      and the rest of the strip comes every second frame -- six a second,
      half the bytes -- rather than a picture that waits on the download */
-  if (strip.loaded === 12 && strip.every === 1 && performance.now() - strip.t0 > 2000) {
-    strip.every = 2;
-    stripOrder = stripOrder.filter(i => i % 2 === 0);
-    stripCursor = 0;
+  if (strip.loaded === 12 && strip.every === 1) {
+    const took = performance.now() - strip.t0;
+    if (took > 4000) strip.every = 4; else if (took > 2000) strip.every = 2;
+    if (strip.every > 1) { stripOrder = stripOrder.filter(i => i % strip.every === 0); stripCursor = 0; }
   }
   /* the curtain: metadata is moot, and "buffered" is the first dozen frames
      of the coarse pass -- four seconds of film a third of a second apart */
@@ -3169,7 +3200,9 @@ function stripStart(){
   const slow = c.saveData || (c.effectiveType && /2g|3g/.test(c.effectiveType));
   strip.every = slow ? 2 : 1;               /* metered: every second frame, half the bytes */
   strip.t0 = performance.now();
-  const passes = slow ? [[4, 0], [4, 2]] : [[4, 0], [4, 2], [2, 1]];
+  /* every eighth frame first (a third of a second apart across the whole
+     opener, 4 MB), then the frames between, twice, then the rest */
+  const passes = slow ? [[8, 0], [8, 4], [4, 2]] : [[8, 0], [8, 4], [4, 2], [2, 1]];
   for (const [m, o] of passes) for (let i = o; i < STRIP_N; i += m) stripOrder.push(i);
   stripSize();
   addEventListener("resize", () => { if (strip.on) { stripSize(); wake(); } });
@@ -3571,10 +3604,11 @@ function tick(now){
   if (strip.on) {
     /* the frame IS the scroll position; the only wait is for bytes */
     const idx = Math.round(smoothP * (STRIP_N - 1));
+    strip.speed = strip.idx < 0 ? 0 : Math.abs(idx - strip.idx);   /* frames per tick */
     if (idx !== strip.idx) { if (strip.idx >= 0) strip.dir = idx > strip.idx ? 1 : -1; strip.idx = idx; }
-    const j = stripDraw(idx);
+    const j = stripDraw(idx, now);
     stripWarm(idx, now);
-    const starving = j < 0 || Math.abs(j - idx) > 4;   /* a third of a second away */
+    const starving = j < 0 || Math.abs(j - idx) > 8;   /* a third of a second away */
     if (load) {
       load.classList.toggle("gone", !starving);
       if (starving && ltxt) { const f = strip.loaded / STRIP_N; ltxt.textContent = "Loading the film · " + Math.round(f * 100) + "%"; fill.style.transform = "scaleX(" + f.toFixed(3) + ")"; }
@@ -3656,7 +3690,7 @@ function tick(now){
   const routesLive = false;
   /* while the film is still chasing the target, the loop has to stay up to
      stop it when it arrives */
-  if (smoothP === targetP && !seeking && !chasing && !routesLive) { rafId = 0; return; }
+  if (smoothP === targetP && !seeking && !chasing && !routesLive && !strip.deferred) { rafId = 0; return; }
   rafId = requestAnimationFrame(tick);
 }
 /* Restarting a parked loop must not count the idle gap as elapsed frame time,
