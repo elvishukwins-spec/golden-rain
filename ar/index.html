@@ -3046,7 +3046,11 @@ let wasPortrait = null;
    cache, warmed by a fetch loop in four passes (every 8th, 4th, 2nd, the
    rest) so the whole opener is reachable after four megabytes. A slow line,
    measured from the first dozen frames, stops at every second or fourth. */
-const STRIP_N = 469, STRIP_DIR = "../assets/video/strip-p-c/", STRIP_W = 1000;
+/* v32 masters (15 Sep): the descent and the drone shot are joined as one
+   continuous move -- no push, no blur -- with the tail re-cropped to start on
+   the descent's last frame. "d"/"c" names because the old ones sit in edge
+   caches for thirty days. */
+const STRIP_N = 465, STRIP_DIR = "../assets/video/strip-p-d/", STRIP_W = 1000;
 const WIN_BACK = 2, WIN_AHEAD = 7;         /* live decoded frames behind / ahead of the reader */
 /* state: 0 not asked, 1 fetching, 2 in the cache, 3 failed, 5 Image live, 4 Image decoded */
 const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP_N), seen: new Uint8Array(STRIP_N),
@@ -3429,7 +3433,7 @@ function chooseUrl(){
   /* the phone file is all-intra at crf 25: indistinguishable from the crf 21
      cut at 1:1 and 11 Mbps instead of 15.5, so a 5G line stays ahead of a
      2-3x drag and the video, not the frames, is the picture */
-  return [portrait, portrait    ? "../assets/video/hero-p1440c.mp4"
+  return [portrait, portrait    ? "../assets/video/hero-p1440d.mp4"
                   : need > 1900 ? "../assets/video/hero-2560b.mp4"
                   : need > 1280 ? "../assets/video/hero-1920b.mp4"
                                 : "../assets/video/hero-1280b.mp4"];
