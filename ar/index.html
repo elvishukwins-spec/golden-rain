@@ -3054,7 +3054,8 @@ const strip = { on: false, imgs: new Array(STRIP_N), state: new Uint8Array(STRIP
                 every: 1, retried: false, t0: 0, live: [], pos: -1, rate: 0, rateS: 0, stride: 1, chasing: false,
                 cap: 30, lat: 0, rev: 0,
                 /* the hybrid: "video" while the <video> is the picture, "strip" while the frames are */
-                hybrid: false, mode: "strip", modeT: 0, returning: false, shown: false };
+                hybrid: false, mode: "strip", modeT: 0, returning: false, shown: false,
+                lastT: -1, vT: 0, starveT: 0, stillT: 0, handovers: 0, plays: 0, pauses: 0, seeks: 0 };
 const LEASH_V = 1.2;      /* seconds the video may fall behind before the frames take over */
 const RETURN_V = 0.4;     /* and how close the frames must be to the target before the video comes back */
 const stripUrl = j => STRIP_DIR + String(j).padStart(3, "0") + ".webp";
@@ -3235,6 +3236,34 @@ function stripArrived(j){
   if (!opened && strip.loaded >= 4 && (strip.state[0] >= 2 || strip.seen[0])) openHero();
   if (Math.abs(j - Math.max(0, strip.idx)) <= WIN_AHEAD * strip.stride) { stripWindow(Math.max(0, strip.idx), 0, performance.now()); wake(); }
 }
+/* ?diag=1 -- what THIS phone is doing, on the phone, because no emulator
+   here has reproduced what the client sees. A screenshot of it is enough. */
+const DIAG = /[?&]diag=1/.test(location.search);
+let diagEl = null, diagEvents = [];
+function diagLog(msg){ if (!DIAG) return; diagEvents.push(((performance.now() / 1000) | 0) + "s " + msg); if (diagEvents.length > 7) diagEvents.shift(); }
+if (DIAG) {
+  diagEl = document.createElement("pre");
+  diagEl.style.cssText = "position:fixed;left:6px;top:96px;z-index:99999;margin:0;padding:6px 8px;background:rgba(0,0,0,.72);color:#9f9;font:10px/1.35 ui-monospace,Menlo,monospace;white-space:pre;pointer-events:none;border-radius:6px;max-width:92vw";
+  document.body.appendChild(diagEl);
+  let raf = 0, vfr = 0, lastRaf = performance.now(), rafHz = 0, vfHz = 0;
+  const rr = () => { raf++; requestAnimationFrame(rr); }; requestAnimationFrame(rr);
+  if (hero.requestVideoFrameCallback) { const rv = () => { vfr++; hero.requestVideoFrameCallback(rv); }; hero.requestVideoFrameCallback(rv); }
+  setInterval(() => {
+    const el = (performance.now() - lastRaf) / 1000; lastRaf = performance.now();
+    rafHz = Math.round(raf / el); vfHz = Math.round(vfr / el); raf = 0; vfr = 0;
+    const b = hero.buffered, ahead = b && b.length ? Math.max(0, bufferedEdge(hero.currentTime) - hero.currentTime) : 0;
+    const dec = strip.on ? strip.live.filter(j => strip.state[j] === 4).length : 0;
+    const ua = /iPhone|iPad/.test(navigator.userAgent) ? (/CriOS/.test(navigator.userAgent) ? "iOS Chrome" : /FxiOS/.test(navigator.userAgent) ? "iOS Firefox" : "iOS Safari") : /Android/.test(navigator.userAgent) ? "Android" : "other";
+    diagEl.textContent =
+      ua + "  " + innerWidth + "x" + innerHeight + " @" + (devicePixelRatio || 1) + "x  js " + rafHz + "fps  lenis " + (window.__lenis ? "on" : "off") + "\n" +
+      "mode " + (strip.on ? (strip.hybrid ? "hybrid/" : "frames/") + strip.mode : "video-desktop") + "  p " + smoothP.toFixed(3) + "\n" +
+      "video " + (hero.currentSrc || "").split("/").pop() + "  t " + hero.currentTime.toFixed(2) + "/" + (dur || 0).toFixed(1) + "  rate " + hero.playbackRate.toFixed(2) + (hero.paused ? " paused" : " playing") + "\n" +
+      "video frames " + vfHz + "/s  buffered ahead " + ahead.toFixed(1) + "s  ready " + hero.readyState + (noPlay ? "  PLAY REFUSED" : "") + "\n" +
+      "scroll speed " + strip.vT.toFixed(2) + "x  plays " + strip.plays + "  pauses " + strip.pauses + "  handovers " + strip.handovers + "  seeks " + strip.seeks + "\n" +
+      "frames live " + (strip.on ? strip.live.length : 0) + " decoded " + dec + "  lat " + Math.round(strip.lat || 0) + "ms  cap " + Math.round(strip.cap || 0) + "  stride " + (strip.stride || 1) + "  loaded " + (strip.on ? strip.loaded : 0) + "\n" +
+      diagEvents.join("\n");
+  }, 500);
+}
 function stripStart(){
   strip.on = true;
   window.__strip = strip;   /* read by the phone checks in _launch */
@@ -3269,6 +3298,8 @@ function stripVideoBack(now){
     if (!strip.returning) return;
     strip.returning = false;
     strip.mode = "video"; strip.modeT = performance.now();
+    strip.lastT = -1; strip.vT = 0; strip.stillT = 0; strip.starveT = 0;
+    diagLog("→video playing");
     strip.cv.classList.remove("is-on"); strip.shown = false;
     for (const j of strip.live) stripRelease(j);
     strip.live = [];
@@ -3694,27 +3725,51 @@ function tick(now){
   if (strip.on && strip.mode === "video") {
     const useVideo = strip.hybrid && !noPlay && dur > 0;
     let T = smoothP * (dur - 0.05);
+    /* the scroll's own speed in film-seconds per second, smoothed: the rate
+       the film has to run at just to keep station */
+    const vT = strip.lastT >= 0 ? (T - strip.lastT) / Math.max(dt, 1 / 120) : 0;
+    strip.vT = strip.vT + (vT - strip.vT) * Math.min(1, dt * 12);
+    strip.lastT = T;
     const edge = useVideo ? bufferedEdge(hero.currentTime) : -1;
     const starving = edge >= 0 && T > edge - 0.05 && T > hero.currentTime;
+    if (starving) { if (!strip.starveT) strip.starveT = now; T = Math.max(hero.currentTime, edge - 0.05); } else strip.starveT = 0;
     const gap = T - hero.currentTime;
     /* to the frames: nothing to play, the film has fallen too far behind a
-       flick, the reader is going backwards, or the bytes have not arrived */
-    if (!useVideo || gap > LEASH_V || gap < -0.06 || starving || seeking) {
+       flick, the reader is going backwards (more than a small overshoot), or
+       the bytes have been missing for a moment */
+    if (!useVideo || gap > LEASH_V || gap < -0.3 || (starving && now - strip.starveT > 400) || seeking) {
       if (chasing || !hero.paused) { hero.pause(); chasing = false; try { hero.playbackRate = 1; } catch(e){} }
       strip.pos = Math.max(0, Math.min(STRIP_N - 1, hero.currentTime * 24));
       strip.idx = Math.round(strip.pos); strip.drawn = -1;
       strip.mode = "strip"; strip.modeT = now; strip.returning = false; strip.reseek = false; strip.shown = false;
+      strip.handovers++; diagLog("→frames gap " + gap.toFixed(2) + (starving ? " starving" : "") + (!useVideo ? " novideo" : ""));
       if (load) load.classList.add("gone");
     } else {
       if (load) load.classList.add("gone");
-      if (gap > 1.5 / FPS) {
-        const rate = Math.min(3, Math.max(0.5, Math.round(gap / 0.14 * 4) / 4));
-        if (Math.abs(hero.playbackRate - rate) > 0.2) { try { hero.playbackRate = rate; } catch(e){} }
+      /* Keep playing while the scroll moves. The rate is the scroll's speed
+         plus a correction for the gap -- never below a quarter speed while
+         there is a gap to close or the scroll is moving, up to 3x -- and the
+         film pauses only once the scroll has been still for a moment with
+         the gap closed. Every play() on iOS is a 100-200 ms wait for a
+         frame; the old pause-when-caught-up loop paid that several times a
+         second at a slow drag. */
+      const moving = Math.abs(strip.vT) > 0.02;
+      /* play() on a video that has reached its end restarts it from zero */
+      if (hero.ended || hero.currentTime >= dur - 0.08) { if (gap > 1.5 / FPS && hero.paused) { try { hero.currentTime = Math.max(0, hero.currentTime - 0.1); } catch(e){} } }
+      else if (moving && gap > -0.1 || gap > 1.5 / FPS) {
+        strip.stillT = 0;
+        let rate = strip.vT + gap * 4;
+        rate = Math.min(3, Math.max(0.1, rate));
+        rate = Math.round(rate * 10) / 10;
+        if (Math.abs(hero.playbackRate - rate) >= 0.1) { try { hero.playbackRate = rate; } catch(e){} }
         if (hero.paused) {
-          chasing = true;
-          hero.play().catch(err => { chasing = false; if (!err || err.name !== "AbortError") { noPlay = true; wake(); } });
+          chasing = true; strip.plays++;
+          hero.play().catch(err => { chasing = false; if (!err || err.name !== "AbortError") { noPlay = true; diagLog("play() refused: " + (err && err.name)); wake(); } });
         }
-      } else if (chasing || !hero.paused) { hero.pause(); chasing = false; try { hero.playbackRate = 1; } catch(e){} }
+      } else {
+        if (!strip.stillT) strip.stillT = now;
+        if (now - strip.stillT > 200 && (chasing || !hero.paused)) { hero.pause(); chasing = false; strip.pauses++; try { hero.playbackRate = 1; } catch(e){} }
+      }
     }
   }
   if (strip.on && strip.mode === "strip") {
@@ -3764,8 +3819,9 @@ function tick(now){
     if (strip.hybrid && !noPlay && dur > 0 && !strip.returning && !seeking && strip.dir > 0 && now - strip.modeT > 500) {
       const gapS = (T - strip.pos) / 24;
       const tv = strip.pos / 24;
-      if (gapS >= -0.04 && gapS < RETURN_V && bufferedEdge(tv) >= tv + 3) {   /* and three seconds of film in hand, so it stays */
+      if (gapS >= -0.04 && gapS < RETURN_V && tv < dur - 0.5 && bufferedEdge(tv) >= tv + 3) {   /* and three seconds of film in hand, so it stays */
         strip.returning = true; strip.reseek = false;
+        strip.seeks++; diagLog("→video seek " + tv.toFixed(2));
         if (Math.abs(hero.currentTime - tv) < 0.03) stripVideoBack(now);   /* already there: a seek would fire no event */
         else {
           seeking = true; seekStart = now;
